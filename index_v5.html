@@ -1,0 +1,975 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>العصر الذكي — بوابة الموارد (v5)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: { brand: { 500:'#3b82f6', 600:'#2563eb' }, violet: { 500: '#8b5cf6', 600: '#7c3aed' } },
+            boxShadow: { soft: '0 10px 30px rgba(0,0,0,0.08)' },
+            borderRadius: { xxl: '1.25rem' },
+          }
+        }
+      }
+    </script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      :root { --glass: rgba(255,255,255,.72); --glassDark: rgba(12,18,32,.62); }
+      html, body { height: 100%; }
+      body {
+        background:
+          radial-gradient(900px 400px at 15% -200px, #e9f1ff 20%, transparent 60%),
+          radial-gradient(900px 400px at 115% 110%, #e6fff6 15%, transparent 55%),
+          linear-gradient(120deg, #f7fbff, #ffffff);
+      }
+      .dark body {
+        background:
+          radial-gradient(900px 400px at 10% -200px, #0b1b45 20%, transparent 60%),
+          radial-gradient(900px 400px at 110% 110%, #063a2e 15%, transparent 55%),
+          linear-gradient(120deg, #0b1220, #0b1020);
+      }
+      .glass { background: var(--glass); }
+      .dark .glass { background: var(--glassDark); }
+      .editable:hover { outline: 2px dashed rgba(37,99,235,.5); outline-offset: 3px; cursor: text; }
+      @media print { .no-print { display:none !important; } }
+    </style>
+  </head>
+  <body>
+    <div id="root" class="px-3 sm:px-6 py-6"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      // Utils
+      const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
+      const load = (k, fb) => { try{ const r=localStorage.getItem(k); return r? JSON.parse(r): fb; }catch{return fb;} };
+      const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+      const has  = (user, key) => user && (user.permissions?.includes('*') || user.permissions?.includes(key));
+
+      // Permissions
+      const PERMISSIONS = [
+        { key:"dashboard:view", label:"عرض اللوحة" },
+        { key:"employees:view", label:"عرض الموظفين" },
+        { key:"employees:edit", label:"تعديل الموظفين" },
+        { key:"fines:view", label:"عرض الغرامات" },
+        { key:"fines:edit", label:"تعديل الغرامات" },
+        { key:"vehicles:view", label:"عرض المركبات" },
+        { key:"vehicles:edit", label:"تعديل المركبات" },
+        { key:"evaluations:view", label:"عرض التقييمات" },
+        { key:"evaluations:edit", label:"تعديل التقييمات" },
+        { key:"contracts:view", label:"عرض العقود" },
+        { key:"contracts:edit", label:"تعديل العقود" },
+        { key:"instructions:view", label:"عرض التعليمات" },
+        { key:"instructions:edit", label:"تعديل التعليمات" },
+        { key:"applications:view", label:"عرض الطلبات" },
+        { key:"applications:edit", label:"تعديل/اعتماد الطلبات" },
+        { key:"admin:panel", label:"لوحة المسؤول" },
+      ];
+
+      const PAGES = [
+        { key:"dashboard", label:"اللوحة" },
+        { key:"employees", label:"الموظفون" },
+        { key:"fines", label:"الغرامات" },
+        { key:"vehicles", label:"المركبات" },
+        { key:"evaluations", label:"التقييمات" },
+        { key:"contracts", label:"العقود" },
+        { key:"instructions", label:"التعليمات" },
+        { key:"applications", label:"طلبات التوظيف" },
+        { key:"admin", label:"المسؤول" },
+      ];
+
+      // Defaults
+      const DEFAULT_USERS = [
+        { id: uid(), username:"admin", password:"admin", role:"admin", permissions:["*"], restrictSelf:false, linkedEmployeeId:"" },
+        { id: uid(), username:"ahmed", password:"123", role:"staff", permissions:["employees:view","fines:view","vehicles:view","contracts:view"], restrictSelf:true, linkedEmployeeId:"" },
+      ];
+      const DEFAULT_DATA = {
+        employees:[
+          { id: uid(), name:"أحمد علي", dept:"الصيانة", position:"فني صيانة", phone:"07xxxxxxxx", joinDate:"2024-02-01" },
+          { id: uid(), name:"سارة محمد", dept:"الدعم", position:"خدمة عملاء", phone:"07xxxxxxxx", joinDate:"2024-05-15" },
+        ],
+        departments:["الصيانة","الدعم","التسويق","الحسابات"],
+        positions:["فني صيانة","مشرف صيانة","خدمة عملاء","محاسب"],
+        fines:[],
+        vehicles:[{ id: uid(), plate:"ع ب 12345", model:"هايلوكس", assignedTo:"" }],
+        evaluations:[],
+        contracts:[],
+        instructionsPages:[ { id: uid(), title:"تعليمات عامة", content:"- الالتزام بالزي الرسمي\n- احترام أوقات العمل\n- اتباع تعليمات السلامة" } ],
+        applications:[],
+        settings:{ fineHourRate: 4000 }
+      };
+      const DEFAULT_SITE = { brandName:"العصر الذكي", tagline:"بوابة الموارد البشرية", texts:{} };
+
+      const filterByScope = (auth, items, pickEmployeeId) => {
+        if(!auth?.restrictSelf || !auth?.linkedEmployeeId) return items;
+        return items.filter(x => pickEmployeeId(x) === auth.linkedEmployeeId);
+      };
+
+      // Generic inline editable text (persist in site.texts[id])
+      function E({id, def, site, setSite, editMode, as="span", className=""}){
+        const Tag = as;
+        const txt = site.texts?.[id] ?? def;
+        const onInput = (e)=>{
+          const v = e.currentTarget.innerText;
+          setSite(prev => ({...prev, texts:{ ...(prev.texts||{}), [id]: v }}));
+        };
+        return (
+          <Tag contentEditable={editMode} suppressContentEditableWarning
+               onInput={onInput}
+               className={(editMode? "editable ": "") + className}>
+            {txt}
+          </Tag>
+        );
+      }
+
+      function App(){
+        const [dark, setDark] = useState(false);
+        const [users, setUsers] = useState(()=>load("az_users_v5", DEFAULT_USERS));
+        const [auth, setAuth] = useState(()=>load("az_auth_v5", null));
+        const [data, setData]  = useState(()=>load("az_data_v5", DEFAULT_DATA));
+        const [site, setSite]  = useState(()=>load("az_site_v5", DEFAULT_SITE));
+        const [editMode, setEditMode] = useState(false);
+        const [open, setOpen] = useState(false);
+
+        const initial = (window.location.hash.replace('#','') || 'login');
+        const [page, setPage] = useState(initial);
+
+        useEffect(()=>save("az_users_v5", users), [users]);
+        useEffect(()=>save("az_auth_v5",  auth),  [auth]);
+        useEffect(()=>save("az_data_v5",  data),  [data]);
+        useEffect(()=>save("az_site_v5",  site),  [site]);
+
+        useEffect(()=>{
+          const onHash = ()=> setPage(window.location.hash.replace('#','') || 'login');
+          window.addEventListener('hashchange', onHash);
+          return ()=>window.removeEventListener('hashchange', onHash);
+        },[]);
+
+        const go = (key)=>{
+          if(!auth && !["apply","myapp","login"].includes(key)) { window.location.hash = "login"; return; }
+          window.location.hash = key;
+          setOpen(false);
+        };
+        const brandClick = ()=> go(auth? "dashboard":"login");
+
+        return (
+          <div className={dark? "dark": ""}>
+            <div className="max-w-[1200px] mx-auto">
+              <div className="chrome rounded-[18px] overflow-hidden border border-white/60 dark:border-white/10 shadow-soft">
+                {/* Top bar */}
+                <div className="px-3 sm:px-5 py-2 flex items-center justify-between glass">
+                  <div className="flex items-center gap-2">
+                    <span className="h-3 w-3 rounded-full bg-rose-400"></span>
+                    <span className="h-3 w-3 rounded-full bg-amber-400"></span>
+                    <span className="h-3 w-3 rounded-full bg-emerald-400"></span>
+                    <div className="ml-3 text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">العصر الذكي — بوابة الموارد (v5)</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {has(auth,"admin:panel") && (
+                      <button onClick={()=>setEditMode(!editMode)} className={"text-xs sm:text-sm rounded-xl px-3 py-1 border " + (editMode? "bg-brand-600 text-white border-brand-600":"border-white/60 dark:border-white/10 hover:bg-white/60 dark:hover:bg-white/5")}>
+                        {editMode? "وضع التحرير: مفعل" : "وضع التحرير"}
+                      </button>
+                    )}
+                    <button onClick={()=>setDark(!dark)} className="text-xs sm:text-sm rounded-xl border border-white/60 dark:border-white/10 px-3 py-1 hover:bg-white/60 dark:hover:bg-white/5">المظهر: {dark? "داكن":"فاتح"}</button>
+                    {auth ? (
+                      <button onClick={()=>{ setAuth(null); go("login"); }} className="text-xs sm:text-sm rounded-xl border border-white/60 dark:border-white/10 px-3 py-1 hover:bg-white/60 dark:hover:bg-white/5">تسجيل خروج</button>
+                    ) : (
+                      <>
+                        <a onClick={()=>go("apply")} className="text-xs sm:text-sm rounded-xl border border-white/60 dark:border-white/10 px-3 py-1 hover:bg-white/60 dark:hover:bg-white/5 cursor-pointer">تقديم على وظيفة</a>
+                        <a onClick={()=>go("myapp")} className="text-xs sm:text-sm rounded-xl border border-white/60 dark:border-white/10 px-3 py-1 hover:bg-white/60 dark:hover:bg-white/5 cursor-pointer">حالة الطلب</a>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Header / Nav */}
+                <header className="sticky top-0 z-30 border-b border-white/60 dark:border-white/10 glass">
+                  <nav className="px-4 sm:px-6 py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3 cursor-pointer" onClick={brandClick} title="الرجوع للصفحة الرئيسية">
+                      <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-2xl grid place-items-center text-white font-bold bg-gradient-to-br from-brand-500 to-violet-600 shadow-soft">ع</div>
+                      <div>
+                        <E id="brandName" def={site.brandName} site={site} setSite={setSite} editMode={editMode} className="text-sm sm:text-lg font-semibold" />
+                        <E id="tagline" def={site.tagline} site={site} setSite={setSite} editMode={editMode} className="block text-[11px] sm:text-xs text-slate-600 dark:text-slate-300" />
+                      </div>
+                    </div>
+
+                    <div className="hidden md:flex items-center gap-1">
+                      {auth && PAGES.map(p => (p.key!=="applications") && has(auth, `${p.key}:view`) && (
+                        <TopBtn key={p.key} active={page===p.key} onClick={()=>go(p.key)}><E id={`nav_${p.key}`} def={p.label} site={site} setSite={setSite} editMode={editMode} /></TopBtn>
+                      ))}
+                      {auth && has(auth,"applications:view") && <TopBtn active={page==="applications"} onClick={()=>go("applications")}><E id="nav_applications" def="طلبات التوظيف" site={site} setSite={setSite} editMode={editMode} /></TopBtn>}
+                      <TopBtn active={page==="apply"} onClick={()=>go("apply")}><E id="nav_apply" def="التقديم على وظيفة" site={site} setSite={setSite} editMode={editMode} /></TopBtn>
+                      <TopBtn active={page==="myapp"} onClick={()=>go("myapp")}><E id="nav_myapp" def="حالة الطلب" site={site} setSite={setSite} editMode={editMode} /></TopBtn>
+                    </div>
+
+                    <button onClick={()=>setOpen((v)=>!v)} className="md:hidden rounded-lg px-3 py-2 hover:bg-black/5 dark:hover:bg-white/10">القائمة</button>
+                  </nav>
+
+                  {open && (
+                    <div className="md:hidden px-4 pb-3 glass border-t border-white/60 dark:border-white/10">
+                      <div className="flex flex-col gap-1">
+                        {auth && PAGES.map(p => (p.key!=="applications") && has(auth, `${p.key}:view`) && (
+                          <button key={p.key} onClick={()=>go(p.key)} className="text-right px-3 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/10"><E id={`navm_${p.key}`} def={p.label} site={site} setSite={setSite} editMode={editMode} /></button>
+                        ))}
+                        {auth && has(auth,"applications:view") && <button onClick={()=>go("applications")} className="text-right px-3 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/10"><E id="navm_applications" def="طلبات التوظيف" site={site} setSite={setSite} editMode={editMode} /></button>}
+                        <button onClick={()=>go("apply")} className="text-right px-3 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/10"><E id="navm_apply" def="التقديم على وظيفة" site={site} setSite={setSite} editMode={editMode} /></button>
+                        <button onClick={()=>go("myapp")} className="text-right px-3 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/10"><E id="navm_myapp" def="حالة الطلب" site={site} setSite={setSite} editMode={editMode} /></button>
+                      </div>
+                    </div>
+                  )}
+                </header>
+
+                {/* Main */}
+                <main className="px-3 sm:px-6 py-6">
+                  {!auth && page==="login" && <Login onLogin={(u)=>{ setAuth(u); go("dashboard"); }} site={site} setSite={setSite} editMode={editMode} users={users} />}
+                  {page==="apply" && <Apply data={data} setData={setData} site={site} setSite={setSite} editMode={editMode} />}
+                  {page==="myapp" && <ApplyStatus site={site} setSite={setSite} editMode={editMode} />}
+
+                  {auth && (
+                    <>
+                      <PageTabs auth={auth} page={page} go={go} site={site} setSite={setSite} editMode={editMode} />
+                      {page==="dashboard"   && has(auth,"dashboard:view")   && <Dashboard data={data} setData={setData} auth={auth} site={site} setSite={setSite} editMode={editMode} />}
+                      {page==="employees"   && has(auth,"employees:view")   && <Employees data={data} setData={setData} canEdit={has(auth,"employees:edit")} auth={auth} site={site} setSite={setSite} editMode={editMode} />}
+                      {page==="fines"       && has(auth,"fines:view")       && <Fines data={data} setData={setData} canEdit={has(auth,"fines:edit")} auth={auth} site={site} setSite={setSite} editMode={editMode} />}
+                      {page==="vehicles"    && has(auth,"vehicles:view")    && <Vehicles data={data} setData={setData} canEdit={has(auth,"vehicles:edit")} auth={auth} site={site} setSite={setSite} editMode={editMode} />}
+                      {page==="evaluations" && has(auth,"evaluations:view") && <Evaluations data={data} setData={setData} canEdit={has(auth,"evaluations:edit")} auth={auth} site={site} setSite={setSite} editMode={editMode} />}
+                      {page==="contracts"   && has(auth,"contracts:view")   && <Contracts data={data} setData={setData} canEdit={has(auth,"contracts:edit")} auth={auth} site={site} setSite={setSite} editMode={editMode} />}
+                      {page==="instructions"&& has(auth,"instructions:view")&& <Instructions data={data} setData={setData} canEdit={has(auth,"instructions:edit")} site={site} setSite={setSite} editMode={editMode} />}
+                      {page==="applications"&& has(auth,"applications:view")&& <Applications data={data} setData={setData} canEdit={has(auth,"applications:edit")} site={site} setSite={setSite} editMode={editMode} />}
+                      {page==="admin"       && has(auth,"admin:panel")      && <Admin users={users} setUsers={setUsers} data={data} setData={setData} site={site} setSite={setSite} editMode={editMode} />}
+                    </>
+                  )}
+                </main>
+
+                {/* Footer */}
+                <footer className="border-t border-white/60 dark:border-white/10 glass px-4 sm:px-6 py-5">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
+                    <div className="text-slate-700 dark:text-slate-200">© <span id="y"></span> — <E id="footer_brand" def={site.brandName} site={site} setSite={setSite} editMode={editMode} /></div>
+                    <div className="flex gap-4 text-slate-600 dark:text-slate-300">
+                      <span>📞 <E id="footer_phone" def="07838737309" site={site} setSite={setSite} editMode={editMode} /></span>
+                      <span>✉️ <a class="underline" href="mailto:grdo2697@gmail.com"><E id="footer_email" def="grdo2697@gmail.com" site={site} setSite={setSite} editMode={editMode} /></a></span>
+                    </div>
+                  </div>
+                </footer>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      document.addEventListener('DOMContentLoaded', ()=>{ document.getElementById('y').textContent = new Date().getFullYear(); });
+
+      const TopBtn = ({children, onClick, active}) => (
+        <button onClick={onClick}
+          className={"inline-flex items-center gap-2 rounded-2xl px-3 py-2 text-sm font-medium transition " +
+          (active? "bg-brand-600 text-white shadow-soft" : "hover:bg-white/60 dark:hover:bg-white/10")}>
+          {children}
+        </button>
+      );
+      const Card = ({children, className=""}) => (
+        <div className={"rounded-3xl border border-white/60 dark:border-white/10 glass shadow-soft "+className}>{children}</div>
+      );
+      const Field = ({label, value, onChange, type="text", placeholder="", required=false, editMode=false, site, setSite, id}) => (
+        <label className="block">
+          <span className="text-sm"><E id={id||("lbl_"+label)} def={label} site={site} setSite={setSite} editMode={editMode} />{required && <span className="text-rose-600">*</span>}</span>
+          <input type={type} placeholder={placeholder} required={required} className="mt-1 w-full rounded-2xl border border-white/60 dark:border-white/10 bg-white/80 dark:bg-white/5 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-400" value={value} onChange={e=>onChange(e.target.value)} />
+        </label>
+      );
+      const TextArea = ({label, value, onChange, required=false, editMode=false, site, setSite, id}) => (
+        <label className="block">
+          <span className="text-sm"><E id={id||("lbl_"+label)} def={label} site={site} setSite={setSite} editMode={editMode} />{required && <span className="text-rose-600">*</span>}</span>
+          <textarea required={required} className="mt-1 w-full min-height-[120px] rounded-2xl border border-white/60 dark:border-white/10 bg-white/80 dark:bg-white/5 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-400" value={value} onChange={e=>onChange(e.target.value)} />
+        </label>
+      );
+      const SelectField = ({label, value, onChange, options, required=false, editMode=false, site, setSite, id}) => (
+        <label className="block">
+          <span className="text-sm"><E id={id||("lbl_"+label)} def={label} site={site} setSite={setSite} editMode={editMode} />{required && <span className="text-rose-600">*</span>}</span>
+          <select required={required} className="mt-1 w-full rounded-2xl border border-white/60 dark:border-white/10 bg-white/80 dark:bg-white/5 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-400" value={value} onChange={e=>onChange(e.target.value)}>
+            {options.map((o,i)=>(<option key={i} value={o.value}>{o.label}</option>))}
+          </select>
+        </label>
+      );
+      const IconBtn = ({children, onClick, className="", editMode=false, site, setSite, id, defText}) => (
+        <button onClick={onClick} className={"inline-flex items-center gap-2 rounded-2xl border border-white/60 dark:border-white/10 px-3 py-2 hover:bg-white/70 dark:hover:bg-white/10 bg-white/80 dark:bg-white/5 transition " + className}>
+          <E id={id||("btn_"+(defText||""))} def={defText||children} site={site} setSite={setSite} editMode={editMode} />
+        </button>
+      );
+
+      // Login
+      function Login({onLogin, users, site, setSite, editMode}){
+        const [username, setU] = useState(""); const [password, setP] = useState(""); const [err, setErr] = useState("");
+        const submit=(e)=>{ e.preventDefault(); const u = users.find(x=>x.username===username && x.password===password); if(!u){ setErr("بيانات الدخول غير صحيحة"); return; } onLogin(u); };
+        return (
+          <section className="py-12">
+            <div className="grid md:grid-cols-2 gap-6 items-center">
+              <Card className="p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="h-12 w-12 rounded-2xl grid place-items-center text-white font-bold text-lg bg-gradient-to-br from-brand-500 to-violet-600">ع</div>
+                  <div>
+                    <div className="text-xl font-semibold"><E id="login_welcome" def="مرحبًا بك في" site={site} setSite={setSite} editMode={editMode} /> <span className="font-bold"><E id="login_brand" def="العصر الذكي" site={site} setSite={setSite} editMode={editMode} /></span></div>
+                    <div className="text-sm text-slate-600 dark:text-slate-300"><E id="login_hint" def="يرجى تسجيل الدخول للمتابعة أو التقديم على وظيفة" site={site} setSite={setSite} editMode={editMode} /></div>
+                  </div>
+                </div>
+                <form onSubmit={submit} className="space-y-4">
+                  <Field label="اسم المستخدم" value={username} onChange={setU} required editMode={editMode} site={site} setSite={setSite} id="lbl_username" />
+                  <Field label="كلمة المرور" value={password} onChange={setP} required editMode={editMode} site={site} setSite={setSite} id="lbl_password" />
+                  {err && <p className="text-sm text-rose-600">{err}</p>}
+                  <button className="w-full rounded-2xl px-5 py-3 bg-gradient-to-r from-brand-600 to-violet-600 text-white font-semibold hover:opacity-90 transition"><E id="btn_login" def="دخول" site={site} setSite={setSite} editMode={editMode} /></button>
+                  <p className="text-xs text-slate-500"><E id="login_demo" def="تجربة: admin/admin — ahmed/123" site={site} setSite={setSite} editMode={editMode} /></p>
+                </form>
+              </Card>
+              <Card className="p-8 hidden md:block">
+                <div className="h-[320px] rounded-2xl bg-gradient-to-br from-brand-400 via-brand-600 to-violet-600 relative overflow-hidden">
+                  <div className="absolute bottom-6 right-6 text-white/90 max-w-sm">
+                    <h3 className="text-2xl font-bold mb-2"><E id="hero_title" def="واجهة عصرية قابلة للتحرير" site={site} setSite={setSite} editMode={editMode} /></h3>
+                    <p className="text-sm leading-relaxed"><E id="hero_desc" def="فعّل “وضع التحرير” من الشريط العلوي لتعديل النصوص مباشرةً." site={site} setSite={setSite} editMode={editMode} /></p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </section>
+        );
+      }
+
+      function PageTabs({auth, page, go, site, setSite, editMode}){
+        const tabs = PAGES.filter(p => p.key!=="applications" && has(auth, `${p.key}:view`));
+        if(!tabs.length) return null;
+        return (
+          <div className="mb-5 flex flex-wrap gap-2">
+            {tabs.map(t => (
+              <button key={t.key} onClick={()=>go(t.key)}
+                className={"px-4 py-2 rounded-2xl border text-sm transition " +
+                  (page===t.key? "bg-brand-600 text-white shadow-soft border-brand-600" : "hover:bg-white/60 dark:hover:bg-white/10 border-white/60 dark:border-white/10")}>
+                <E id={`tab_${t.key}`} def={t.label} site={site} setSite={setSite} editMode={editMode} />
+              </button>
+            ))}
+            {has(auth,"applications:view") && <button onClick={()=>go("applications")} className={"px-4 py-2 rounded-2xl border text-sm transition " + (page==="applications"? "bg-brand-600 text-white shadow-soft border-brand-600" : "hover:bg-white/60 dark:hover:bg-white/10 border-white/60 dark:border-white/10")}><E id="tab_applications" def="طلبات التوظيف" site={site} setSite={setSite} editMode={editMode} /></button>}
+            {has(auth,"admin:panel") && <button onClick={()=>go("admin")} className={"px-4 py-2 rounded-2xl border text-sm transition " + (page==="admin"? "bg-brand-600 text-white shadow-soft border-brand-600" : "hover:bg-white/60 dark:hover:bg-white/10 border-white/60 dark:border-white/10")}><E id="tab_admin" def="المسؤول" site={site} setSite={setSite} editMode={editMode} /></button>}
+          </div>
+        );
+      }
+
+      function Dashboard({data, setData, auth, site, setSite, editMode}){
+        const totalFines = filterByScope(auth, data.fines, f=>f.employeeId).reduce((a,b)=>a + (Number(b.amount)||0),0);
+        const scopedEmployees = filterByScope(auth, data.employees, e=>e.id);
+        return (
+          <section className="space-y-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card className="p-5"><div className="text-sm"><E id="dash_metric_emp" def="عدد الموظفين" site={site} setSite={setSite} editMode={editMode} /></div><div className="text-2xl font-bold mt-1">{scopedEmployees.length}</div></Card>
+              <Card className="p-5"><div className="text-sm"><E id="dash_metric_fines_count" def="عدد الغرامات" site={site} setSite={setSite} editMode={editMode} /></div><div className="text-2xl font-bold mt-1">{filterByScope(auth, data.fines, f=>f.employeeId).length}</div></Card>
+              <Card className="p-5"><div className="text-sm"><E id="dash_metric_fines_sum" def="إجمالي الغرامات (د.ع)" site={site} setSite={setSite} editMode={editMode} /></div><div className="text-2xl font-bold mt-1">{totalFines.toLocaleString()}</div></Card>
+              <Card className="p-5"><div className="text-sm"><E id="dash_metric_vehicles" def="عدد المركبات" site={site} setSite={setSite} editMode={editMode} /></div><div className="text-2xl font-bold mt-1">{filterByScope(auth, data.vehicles, v=>v.assignedTo || "").length}</div></Card>
+            </div>
+          </section>
+        );
+      }
+
+      function Toolbar({q,setQ, site, setSite, editMode}){ return (
+        <div className="mb-3 flex items-center gap-2">
+          <input placeholder={(site.texts?.search_placeholder)||"بحث..."} className="flex-1 rounded-2xl border border-white/60 dark:border-white/10 bg-white/80 dark:bg-white/5 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-400" value={q} onChange={(e)=>setQ(e.target.value)} />
+          {editMode && (
+            <button onClick={()=>{
+              const val = prompt("نص placeholder لحقل البحث:", site.texts?.search_placeholder || "بحث...");
+              if(val!==null) setSite(prev=>({...prev, texts:{...(prev.texts||{}), search_placeholder: val}}));
+            }} className="text-xs rounded-xl border border-white/60 dark:border-white/10 px-3 py-1 hover:bg-white/60 dark:hover:bg-white/5">تعديل نص البحث</button>
+          )}
+        </div>
+      );}
+      function CrudTable({headers, children}){ return (
+        <div className="rounded-3xl border border-white/60 dark:border-white/10 glass overflow-x-auto shadow-soft">
+          <table className="min-w-full text-sm">
+            <thead><tr className="bg-white/70 dark:bg-white/5 border-b border-white/60 dark:border-white/10">{headers.map((h,i)=>(<th key={i} className="px-3 py-2 font-semibold whitespace-nowrap">{h}</th>))}</tr></thead>
+            <tbody>{children}</tbody>
+          </table>
+        </div>
+      );}
+
+      // Employees
+      function Employees({data,setData,canEdit,auth, site, setSite, editMode}){
+        const [q,setQ]=useState(""); const [form,setForm]=useState({});
+        const src = filterByScope(auth, data.employees, e=>e.id);
+        const list = src.filter(e=>!q || e.name.includes(q) || e.dept?.includes(q) || e.position?.includes(q) || e.phone?.includes(q));
+        const upsert=()=>{ if(!form.name || !form.dept || !form.position) return alert("الاسم + القسم + المنصب مطلوبة"); if(form.id) setData({...data, employees:data.employees.map(e=>e.id===form.id? {...e, ...form}:e)}); else setData({...data, employees:[...data.employees,{id:uid(),name:form.name,dept:form.dept,position:form.position,phone:form.phone||"",joinDate:form.joinDate||""}]}); setForm({}); };
+        const del=(id)=> setData({...data, employees:data.employees.filter(e=>e.id!==id)});
+        return (
+          <section className="space-y-3">
+            <Card className="p-5">
+              <h1 className="text-xl font-bold mb-3"><E id="employees_title" def="الموظفون" site={site} setSite={setSite} editMode={editMode} /></h1>
+              <Toolbar q={q} setQ={setQ} site={site} setSite={setSite} editMode={editMode} />
+              <CrudTable headers={[
+                <E key="h1" id="emp_col_name" def="الاسم" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h2" id="emp_col_dept" def="القسم" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h3" id="emp_col_pos" def="المنصب" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h4" id="emp_col_phone" def="الهاتف" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h5" id="emp_col_join" def="تاريخ الانضمام" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h6" id="emp_col_actions" def="إجراءات" site={site} setSite={setSite} editMode={editMode}/>,
+              ]}>
+                {list.map(e=>(
+                  <tr key={e.id} className="border-t border-white/60 dark:border-white/10">
+                    <td className="px-3 py-2">{e.name}</td>
+                    <td className="px-3 py-2">{e.dept||"—"}</td>
+                    <td className="px-3 py-2">{e.position||"—"}</td>
+                    <td className="px-3 py-2">{e.phone||"—"}</td>
+                    <td className="px-3 py-2">{e.joinDate||"—"}</td>
+                    <td className="px-3 py-2">{canEdit && <div className="flex gap-2"><IconBtn onClick={()=>setForm(e)} defText="تعديل" editMode={editMode} site={site} setSite={setSite} id="btn_edit" /><IconBtn onClick={()=>del(e.id)} defText="حذف" editMode={editMode} site={site} setSite={setSite} id="btn_delete" /></div>}</td>
+                  </tr>
+                ))}
+              </CrudTable>
+              {canEdit && (
+                <Card className="p-4 mt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold"><E id="emp_form_title" def={form.id? "تعديل موظف":"إضافة موظف"} site={site} setSite={setSite} editMode={editMode} /></h3>
+                    <div className="flex gap-2">
+                      <IconBtn onClick={upsert} defText="حفظ" editMode={editMode} site={site} setSite={setSite} id="btn_save" />
+                      <IconBtn onClick={()=>setForm({})} defText="إلغاء" editMode={editMode} site={site} setSite={setSite} id="btn_cancel" />
+                    </div>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <Field label="الاسم" value={form.name||""} onChange={v=>setForm({...form, name:v})} required editMode={editMode} site={site} setSite={setSite} id="emp_lbl_name" />
+                    <SelectField label="القسم" value={form.dept||""} onChange={v=>setForm({...form, dept:v})} required options={[{label:"اختر...", value:""}, ...data.departments.map(d=>({label:d, value:d}))]} editMode={editMode} site={site} setSite={setSite} id="emp_lbl_dept" />
+                    <SelectField label="المنصب" value={form.position||""} onChange={v=>setForm({...form, position:v})} required options={[{label:"اختر...", value:""}, ...data.positions.map(p=>({label:p, value:p}))]} editMode={editMode} site={site} setSite={setSite} id="emp_lbl_pos" />
+                    <Field label="الهاتف" value={form.phone||""} onChange={v=>setForm({...form, phone:v})} editMode={editMode} site={site} setSite={setSite} id="emp_lbl_phone" />
+                    <Field label="تاريخ الانضمام" type="date" value={form.joinDate||""} onChange={v=>setForm({...form, joinDate:v})} editMode={editMode} site={site} setSite={setSite} id="emp_lbl_join" />
+                  </div>
+                </Card>
+              )}
+            </Card>
+          </section>
+        );
+      }
+
+      // Fines
+      function Fines({data,setData,canEdit,auth, site, setSite, editMode}){
+        const [q,setQ]=useState(""); const [form,setForm]=useState({ date:new Date().toISOString().slice(0,10), type:"money", hourRate:data.settings.fineHourRate });
+        const source = filterByScope(auth, data.fines, f=>f.employeeId);
+        const list = source.filter(f=>!q || (f.reason||"").includes(q));
+        const computeAmount = (f)=> f.type==="hours" ? Number(f.hours||0) * Number(f.hourRate||data.settings.fineHourRate||0) : Number(f.amount||0);
+        const upsert=()=>{ if(!form.employeeId) return; let payload = {...form}; payload.amount = computeAmount(form); if(form.id) setData({...data,fines:data.fines.map(x=>x.id===form.id? {...x, ...payload}:x)}); else setData({...data,fines:[...data.fines,{id:uid(), ...payload}]}); setForm({ date:new Date().toISOString().slice(0,10), type:"money", hourRate:data.settings.fineHourRate }); };
+        const del=(id)=> setData({...data,fines:data.fines.filter(f=>f.id!==id)});
+        const nameBy=(id)=> data.employees.find(e=>e.id===id)?.name || "";
+        return (
+          <section className="space-y-3">
+            <Card className="p-5">
+              <h1 className="text-xl font-bold mb-3"><E id="fines_title" def="الغرامات" site={site} setSite={setSite} editMode={editMode} /></h1>
+              <Toolbar q={q} setQ={setQ} site={site} setSite={setSite} editMode={editMode} />
+              <CrudTable headers={[
+                <E key="h1" id="fine_col_emp" def="الموظف" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h2" id="fine_col_amount" def="المبلغ" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h3" id="fine_col_type" def="النوع" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h4" id="fine_col_hours" def="الساعات" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h5" id="fine_col_rate" def="سعر الساعة" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h6" id="fine_col_reason" def="السبب" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h7" id="fine_col_date" def="التاريخ" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h8" id="fine_col_actions" def="إجراءات" site={site} setSite={setSite} editMode={editMode}/>,
+              ]}>
+                {list.map(f=>(
+                  <tr key={f.id} className="border-t border-white/60 dark:border-white/10">
+                    <td className="px-3 py-2">{nameBy(f.employeeId)}</td>
+                    <td className="px-3 py-2">{Number(f.amount).toLocaleString()} د.ع</td>
+                    <td className="px-3 py-2">{f.type==="hours"?"ساعات":"مبلغ"}</td>
+                    <td className="px-3 py-2">{f.type==="hours"?(f.hours||0):"—"}</td>
+                    <td className="px-3 py-2">{f.type==="hours"?(f.hourRate||data.settings.fineHourRate):"—"}</td>
+                    <td className="px-3 py-2">{f.reason||"—"}</td>
+                    <td className="px-3 py-2">{f.date}</td>
+                    <td className="px-3 py-2">{canEdit && <div className="flex gap-2"><IconBtn onClick={()=>setForm(f)} defText="تعديل" editMode={editMode} site={site} setSite={setSite} id="btn_edit" /><IconBtn onClick={()=>del(f.id)} defText="حذف" editMode={editMode} site={site} setSite={setSite} id="btn_delete" /></div>}</td>
+                  </tr>
+                ))}
+              </CrudTable>
+              {canEdit && (
+                <Card className="p-4 mt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold"><E id="fine_form_title" def={form.id? "تعديل غرامة":"إضافة غرامة"} site={site} setSite={setSite} editMode={editMode} /></h3>
+                    <div className="flex gap-2">
+                      <IconBtn onClick={upsert} defText="حفظ" editMode={editMode} site={site} setSite={setSite} id="btn_save" />
+                      <IconBtn onClick={()=>setForm({ date:new Date().toISOString().slice(0,10), type:"money", hourRate:data.settings.fineHourRate })} defText="إلغاء" editMode={editMode} site={site} setSite={setSite} id="btn_cancel" />
+                    </div>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <SelectField label="الموظف" value={form.employeeId||""} onChange={v=>setForm({...form, employeeId:v})} required options={filterByScope(auth,data.employees,e=>e.id).map(e=>({label:e.name, value:e.id}))} editMode={editMode} site={site} setSite={setSite} id="fine_lbl_emp" />
+                    <SelectField label="نوع الغرامة" value={form.type||"money"} onChange={v=>setForm({...form, type:v})} options={[{label:"مبلغ",value:"money"},{label:"ساعات",value:"hours"}]} editMode={editMode} site={site} setSite={setSite} id="fine_lbl_type" />
+                    {form.type==="money" && <Field label="المبلغ (د.ع)" type="number" value={form.amount||0} onChange={v=>setForm({...form, amount:Number(v)})} editMode={editMode} site={site} setSite={setSite} id="fine_lbl_amount" />}
+                    {form.type==="hours" && <>
+                      <Field label="عدد الساعات" type="number" value={form.hours||0} onChange={v=>setForm({...form, hours:Number(v)})} editMode={editMode} site={site} setSite={setSite} id="fine_lbl_hours" />
+                      <Field label="سعر الساعة (د.ع)" type="number" value={form.hourRate||data.settings.fineHourRate} onChange={v=>setForm({...form, hourRate:Number(v)})} editMode={editMode} site={site} setSite={setSite} id="fine_lbl_rate" />
+                      <div className="rounded-xl bg-emerald-50/70 dark:bg-emerald-900/20 border border-emerald-200/70 dark:border-emerald-400/20 px-3 py-2 text-sm">
+                        <E id="fine_current_amount" def="المبلغ الحالي:" site={site} setSite={setSite} editMode={editMode} /> <b>{computeAmount(form).toLocaleString()}</b> <E id="fine_currency" def="د.ع" site={site} setSite={setSite} editMode={editMode} />
+                      </div>
+                    </>}
+                    <Field label="التاريخ" type="date" value={form.date||""} onChange={v=>setForm({...form, date:v})} editMode={editMode} site={site} setSite={setSite} id="fine_lbl_date" />
+                    <Field label="السبب" value={form.reason||""} onChange={v=>setForm({...form, reason:v})} editMode={editMode} site={site} setSite={setSite} id="fine_lbl_reason" />
+                  </div>
+                </Card>
+              )}
+            </Card>
+          </section>
+        );
+      }
+
+      // Vehicles
+      function Vehicles({data,setData,canEdit,auth, site, setSite, editMode}){
+        const [q,setQ]=useState(""); const [form,setForm]=useState({});
+        const src = filterByScope(auth, data.vehicles, v=>v.assignedTo || "");
+        const list = src.filter(v=>!q || v.plate.includes(q) || (v.model||"").includes(q));
+        const upsert=()=>{ if(!form.plate) return; if(form.id) setData({...data,vehicles:data.vehicles.map(v=>v.id===form.id? {...v, ...form}:v)}); else setData({...data,vehicles:[...data.vehicles,{id:uid(), plate:form.plate, model:form.model||"", assignedTo:form.assignedTo||""}]}); setForm({}); };
+        const del=(id)=> setData({...data,vehicles:data.vehicles.filter(v=>v.id!==id)});
+        const nameBy=(id)=> data.employees.find(e=>e.id===id)?.name || "";
+        return (
+          <section className="space-y-3">
+            <Card className="p-5">
+              <h1 className="text-xl font-bold mb-3"><E id="vehicles_title" def="المركبات" site={site} setSite={setSite} editMode={editMode} /></h1>
+              <Toolbar q={q} setQ={setQ} site={site} setSite={setSite} editMode={editMode} />
+              <CrudTable headers={[
+                <E key="h1" id="veh_col_plate" def="اللوحة" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h2" id="veh_col_model" def="الطراز" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h3" id="veh_col_assigned" def="مخصص لـ" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h4" id="veh_col_actions" def="إجراءات" site={site} setSite={setSite} editMode={editMode}/>,
+              ]}>
+                {list.map(v=>(
+                  <tr key={v.id} className="border-t border-white/60 dark:border-white/10">
+                    <td className="px-3 py-2">{v.plate}</td>
+                    <td className="px-3 py-2">{v.model||"—"}</td>
+                    <td className="px-3 py-2">{nameBy(v.assignedTo)||"—"}</td>
+                    <td className="px-3 py-2">{canEdit && <div className="flex gap-2"><IconBtn onClick={()=>setForm(v)} defText="تعديل" editMode={editMode} site={site} setSite={setSite} id="btn_edit" /><IconBtn onClick={()=>del(v.id)} defText="حذف" editMode={editMode} site={site} setSite={setSite} id="btn_delete" /></div>}</td>
+                  </tr>
+                ))}
+              </CrudTable>
+              {canEdit && (
+                <Card className="p-4 mt-4">
+                  <div className="flex items-center justify-between mb-2"><h3 className="font-semibold"><E id="veh_form_title" def={form.id? "تعديل مركبة":"إضافة مركبة"} site={site} setSite={setSite} editMode={editMode} /></h3><div className="flex gap-2"><IconBtn onClick={upsert} defText="حفظ" editMode={editMode} site={site} setSite={setSite} id="btn_save" /><IconBtn onClick={()=>setForm({})} defText="إلغاء" editMode={editMode} site={site} setSite={setSite} id="btn_cancel" /></div></div>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <Field label="رقم اللوحة" value={form.plate||""} onChange={v=>setForm({...form, plate:v})} editMode={editMode} site={site} setSite={setSite} id="veh_lbl_plate" />
+                    <Field label="الطراز" value={form.model||""} onChange={v=>setForm({...form, model:v})} editMode={editMode} site={site} setSite={setSite} id="veh_lbl_model" />
+                    <SelectField label="مخصص للموظف" value={form.assignedTo||""} onChange={v=>setForm({...form, assignedTo:v})} options={[{label:"—", value:""}, ...filterByScope(auth,data.employees,e=>e.id).map(e=>({label:e.name, value:e.id}))]} editMode={editMode} site={site} setSite={setSite} id="veh_lbl_assigned" />
+                  </div>
+                </Card>
+              )}
+            </Card>
+          </section>
+        );
+      }
+
+      // Evaluations
+      function Evaluations({data,setData,canEdit,auth, site, setSite, editMode}){
+        const [q,setQ]=useState(""); const [form,setForm]=useState({ date:new Date().toISOString().slice(0,10), score:5 });
+        const src = filterByScope(auth, data.evaluations, v=>v.employeeId);
+        const list = src.filter(v=>!q || (v.notes||"").includes(q));
+        const upsert=()=>{ if(!form.employeeId || form.score==null) return; if(form.id) setData({...data,evaluations:data.evaluations.map(v=>v.id===form.id? {...v, ...form}:v)}); else setData({...data,evaluations:[...data.evaluations,{id:uid(), employeeId:form.employeeId, score:Number(form.score), notes:form.notes||"", date:form.date }]}); setForm({ date:new Date().toISOString().slice(0,10), score:5 }); };
+        const del=(id)=> setData({...data,evaluations:data.evaluations.filter(v=>v.id!==id)});
+        const nameBy=(id)=> data.employees.find(e=>e.id===id)?.name || "";
+        return (
+          <section className="space-y-3">
+            <Card className="p-5">
+              <h1 className="text-xl font-bold mb-3"><E id="eval_title" def="التقييمات" site={site} setSite={setSite} editMode={editMode} /></h1>
+              <Toolbar q={q} setQ={setQ} site={site} setSite={setSite} editMode={editMode} />
+              <CrudTable headers={[
+                <E key="h1" id="eval_col_emp" def="الموظف" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h2" id="eval_col_score" def="الدرجة" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h3" id="eval_col_notes" def="ملاحظات" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h4" id="eval_col_date" def="التاريخ" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h5" id="eval_col_actions" def="إجراءات" site={site} setSite={setSite} editMode={editMode}/>,
+              ]}>
+                {list.map(v=>(
+                  <tr key={v.id} className="border-t border-white/60 dark:border-white/10">
+                    <td className="px-3 py-2">{nameBy(v.employeeId)}</td>
+                    <td className="px-3 py-2">{v.score}</td>
+                    <td className="px-3 py-2">{v.notes||"—"}</td>
+                    <td className="px-3 py-2">{v.date}</td>
+                    <td className="px-3 py-2">{canEdit && <div className="flex gap-2"><IconBtn onClick={()=>setForm(v)} defText="تعديل" editMode={editMode} site={site} setSite={setSite} id="btn_edit" /><IconBtn onClick={()=>del(v.id)} defText="حذف" editMode={editMode} site={site} setSite={setSite} id="btn_delete" /></div>}</td>
+                  </tr>
+                ))}
+              </CrudTable>
+              {canEdit && (
+                <Card className="p-4 mt-4">
+                  <div className="flex items-center justify-between mb-2"><h3 className="font-semibold"><E id="eval_form_title" def={form.id? "تعديل تقييم":"إضافة تقييم"} site={site} setSite={setSite} editMode={editMode} /></h3><div className="flex gap-2"><IconBtn onClick={upsert} defText="حفظ" editMode={editMode} site={site} setSite={setSite} id="btn_save" /><IconBtn onClick={()=>setForm({ date:new Date().toISOString().slice(0,10), score:5 })} defText="إلغاء" editMode={editMode} site={site} setSite={setSite} id="btn_cancel" /></div></div>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <SelectField label="الموظف" value={form.employeeId||""} onChange={v=>setForm({...form, employeeId:v})} options={filterByScope(auth,data.employees,e=>e.id).map(e=>({label:e.name, value:e.id}))} editMode={editMode} site={site} setSite={setSite} id="eval_lbl_emp" />
+                    <Field label="الدرجة" type="number" value={form.score||0} onChange={v=>setForm({...form, score:Number(v)})} editMode={editMode} site={site} setSite={setSite} id="eval_lbl_score" />
+                    <Field label="التاريخ" type="date" value={form.date||""} onChange={v=>setForm({...form, date:v})} editMode={editMode} site={site} setSite={setSite} id="eval_lbl_date" />
+                    <Field label="ملاحظات" value={form.notes||""} onChange={v=>setForm({...form, notes:v})} editMode={editMode} site={site} setSite={setSite} id="eval_lbl_notes" />
+                  </div>
+                </Card>
+              )}
+            </Card>
+          </section>
+        );
+      }
+
+      // Contracts
+      function Contracts({data,setData,canEdit,auth, site, setSite, editMode}){
+        const [q,setQ]=useState(""); const [form,setForm]=useState({ start:new Date().toISOString().slice(0,10) });
+        const src = filterByScope(auth, data.contracts, v=>v.employeeId);
+        const list = src.filter(v=>!q || (v.title||"").includes(q));
+        const upsert=()=>{ if(!form.employeeId || !form.start) return; if(form.id) setData({...data,contracts:data.contracts.map(v=>v.id===form.id? {...v, ...form}:v)}); else setData({...data,contracts:[...data.contracts,{id:uid(), employeeId:form.employeeId, start:form.start, end:form.end, title:form.title||""}]}); setForm({ start:new Date().toISOString().slice(0,10) }); };
+        const del=(id)=> setData({...data,contracts:data.contracts.filter(v=>v.id!==id)});
+        const nameBy=(id)=> data.employees.find(e=>e.id===id)?.name || "";
+        return (
+          <section className="space-y-3">
+            <Card className="p-5">
+              <h1 className="text-xl font-bold mb-3"><E id="contracts_title" def="العقود" site={site} setSite={setSite} editMode={editMode} /></h1>
+              <Toolbar q={q} setQ={setQ} site={site} setSite={setSite} editMode={editMode} />
+              <CrudTable headers={[
+                <E key="h1" id="con_col_emp" def="الموظف" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h2" id="con_col_title" def="المسمى" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h3" id="con_col_start" def="البداية" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h4" id="con_col_end" def="النهاية" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h5" id="con_col_actions" def="إجراءات" site={site} setSite={setSite} editMode={editMode}/>,
+              ]}>
+                {list.map(v=>(
+                  <tr key={v.id} className="border-t border-white/60 dark:border-white/10">
+                    <td className="px-3 py-2">{nameBy(v.employeeId)}</td>
+                    <td className="px-3 py-2">{v.title||"—"}</td>
+                    <td className="px-3 py-2">{v.start}</td>
+                    <td className="px-3 py-2">{v.end||"—"}</td>
+                    <td className="px-3 py-2">{canEdit && <div className="flex gap-2"><IconBtn onClick={()=>setForm(v)} defText="تعديل" editMode={editMode} site={site} setSite={setSite} id="btn_edit" /><IconBtn onClick={()=>del(v.id)} defText="حذف" editMode={editMode} site={site} setSite={setSite} id="btn_delete" /></div>}</td>
+                  </tr>
+                ))}
+              </CrudTable>
+              {canEdit && (
+                <Card className="p-4 mt-4">
+                  <div className="flex items-center justify-between mb-2"><h3 className="font-semibold"><E id="con_form_title" def={form.id? "تعديل عقد":"إضافة عقد"} site={site} setSite={setSite} editMode={editMode} /></h3><div className="flex gap-2"><IconBtn onClick={upsert} defText="حفظ" editMode={editMode} site={site} setSite={setSite} id="btn_save" /><IconBtn onClick={()=>setForm({ start:new Date().toISOString().slice(0,10) })} defText="إلغاء" editMode={editMode} site={site} setSite={setSite} id="btn_cancel" /></div></div>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <SelectField label="الموظف" value={form.employeeId||""} onChange={v=>setForm({...form, employeeId:v})} options={filterByScope(auth,data.employees,e=>e.id).map(e=>({label:e.name, value:e.id}))} editMode={editMode} site={site} setSite={setSite} id="con_lbl_emp" />
+                    <Field label="المسمى" value={form.title||""} onChange={v=>setForm({...form, title:v})} editMode={editMode} site={site} setSite={setSite} id="con_lbl_title" />
+                    <Field label="تاريخ البداية" type="date" value={form.start||""} onChange={v=>setForm({...form, start:v})} editMode={editMode} site={site} setSite={setSite} id="con_lbl_start" />
+                    <Field label="تاريخ النهاية" type="date" value={form.end||""} onChange={v=>setForm({...form, end:v})} editMode={editMode} site={site} setSite={setSite} id="con_lbl_end" />
+                  </div>
+                </Card>
+              )}
+            </Card>
+          </section>
+        );
+      }
+
+      // Instructions
+      function Instructions({data,setData,canEdit, site, setSite, editMode}){
+        const [pages, setPages] = useState(data.instructionsPages || []);
+        const [activeId, setActiveId] = useState(pages[0]?.id || null);
+        const active = pages.find(p=>p.id===activeId) || null;
+        useEffect(()=>{ setPages(data.instructionsPages || []); if(!activeId && (data.instructionsPages||[])[0]) setActiveId(data.instructionsPages[0].id); }, [data.instructionsPages]);
+        const savePages = (p)=> setData({ ...data, instructionsPages: p });
+        const addPage = ()=>{ const np = { id: uid(), title: "صفحة جديدة", content: "" }; const next=[...pages,np]; setPages(next); setActiveId(np.id); savePages(next); };
+        const delPage = (id)=>{ const next=pages.filter(p=>p.id!==id); setPages(next); setActiveId(next[0]?.id||null); savePages(next); };
+        const updateActive = (field, val)=>{ const next=pages.map(p=>p.id===activeId? {...p,[field]:val}:p); setPages(next); savePages(next); };
+        return (
+          <section className="space-y-3">
+            <Card className="p-5">
+              <div className="flex items-center justify-between mb-3">
+                <h1 className="text-xl font-bold"><E id="inst_title" def="التعليمات" site={site} setSite={setSite} editMode={editMode} /></h1>
+                {canEdit && <div className="flex gap-2"><IconBtn onClick={addPage} defText="إضافة صفحة" editMode={editMode} site={site} setSite={setSite} id="inst_add_page" />{active && <IconBtn onClick={()=>delPage(active.id)} defText="حذف الصفحة الحالية" editMode={editMode} site={site} setSite={setSite} id="inst_del_page" />}</div>}
+              </div>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {pages.map(p => (
+                  <button key={p.id} onClick={()=>setActiveId(p.id)} className={"px-3 py-1.5 rounded-2xl border text-sm " + (activeId===p.id? "bg-brand-600 text-white border-brand-600" : "hover:bg-white/60 dark:hover:bg-white/10 border-white/60 dark:border-white/10")}>{p.title || "بدون عنوان"}</button>
+                ))}
+              </div>
+              {active ? (
+                <div className="grid gap-3">
+                  {canEdit ? (<>
+                    <Field label="عنوان الصفحة" value={active.title||""} onChange={v=>updateActive("title", v)} editMode={editMode} site={site} setSite={setSite} id="inst_lbl_title" />
+                    <label className="block">
+                      <span className="text-sm"><E id="inst_lbl_text" def="النص" site={site} setSite={setSite} editMode={editMode} /></span>
+                      <textarea className="mt-1 w-full min-h-[220px] rounded-2xl border border-white/60 dark:border-white/10 bg-white/80 dark:bg-white/5 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-400" value={active.content||""} onChange={e=>updateActive("content", e.target.value)} />
+                    </label>
+                  </>) : (<pre className="whitespace-pre-wrap leading-relaxed">{active.content}</pre>)}
+                </div>
+              ) : (<div className="text-sm text-slate-600"><E id="inst_no_pages" def="لا توجد صفحات تعليمات بعد." site={site} setSite={setSite} editMode={editMode} /></div>)}
+            </Card>
+          </section>
+        );
+      }
+
+      // Applications with Approve/Reject/Edit (permission gated)
+      function Applications({data,setData,canEdit, site, setSite, editMode}){
+        const [q,setQ]=useState("");
+        const [edit,setEdit]=useState(null);
+        const list = (data.applications||[]).map(a=>({...a, status:a.status||"جديد"}))
+          .filter(a=>!q || a.name.includes(q) || (a.education||"").includes(q) || (a.phone||"").includes(q) || (a.city||"").includes(q));
+
+        const update = (id, patch)=> setData({...data, applications:(data.applications||[]).map(x=>x.id===id? {...x, ...patch}:x)});
+        const del    = (id)=> setData({...data, applications:(data.applications||[]).filter(x=>x.id!==id)});
+
+        const saveEdit = ()=>{
+          if(!edit) return;
+          if(!edit.name || !edit.phone){ alert("الاسم والهاتف إلزاميان"); return; }
+          update(edit.id, {...edit});
+          setEdit(null);
+        };
+
+        return (
+          <section className="space-y-3">
+            <Card className="p-5">
+              <h1 className="text-xl font-bold mb-3"><E id="apps_title" def="طلبات التوظيف" site={site} setSite={setSite} editMode={editMode} /></h1>
+              <Toolbar q={q} setQ={setQ} site={site} setSite={setSite} editMode={editMode} />
+              <CrudTable headers={[
+                <E key="h1" id="apps_col_name" def="الاسم" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h2" id="apps_col_phone" def="الهاتف" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h3" id="apps_col_edu" def="التحصيل" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h4" id="apps_col_city" def="السكن" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h5" id="apps_col_date" def="تاريخ" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h6" id="apps_col_status" def="الحالة" site={site} setSite={setSite} editMode={editMode}/>,
+                <E key="h7" id="apps_col_actions" def="إجراءات" site={site} setSite={setSite} editMode={editMode}/>,
+              ]}>
+                {list.map(a=>(
+                  <tr key={a.id} className="border-t border-white/60 dark:border-white/10">
+                    <td className="px-3 py-2">{a.name}</td>
+                    <td className="px-3 py-2">{a.phone}</td>
+                    <td className="px-3 py-2">{a.education||"—"}</td>
+                    <td className="px-3 py-2">{a.city||"—"}</td>
+                    <td className="px-3 py-2">{a.date||"—"}</td>
+                    <td className="px-3 py-2">
+                      <span className={
+                        "px-2 py-1 rounded-xl text-xs " +
+                        (a.status==="مقبول" ? "bg-emerald-100 text-emerald-700" :
+                         a.status==="مرفوض" ? "bg-rose-100 text-rose-700" :
+                         "bg-amber-100 text-amber-700")
+                      }>{a.status||"جديد"}</span>
+                    </td>
+                    <td className="px-3 py-2">
+                      {canEdit ? (
+                        <div className="flex flex-wrap gap-2">
+                          <IconBtn onClick={()=>setEdit(a)} defText="تعديل" editMode={editMode} site={site} setSite={setSite} id="btn_edit" />
+                          <IconBtn onClick={()=>update(a.id,{status:"مقبول"})} defText="موافقة" editMode={editMode} site={site} setSite={setSite} id="btn_approve" />
+                          <IconBtn onClick={()=>update(a.id,{status:"مرفوض"})} defText="رفض" editMode={editMode} site={site} setSite={setSite} id="btn_reject" />
+                          <IconBtn onClick={()=>del(a.id)} defText="حذف" editMode={editMode} site={site} setSite={setSite} id="btn_delete" />
+                        </div>
+                      ) : <span className="text-xs text-slate-500"><E id="apps_view_only" def="عرض فقط" site={site} setSite={setSite} editMode={editMode} /></span>}
+                    </td>
+                  </tr>
+                ))}
+                {!list.length && (
+                  <tr><td colSpan="7" className="px-3 py-6 text-center text-slate-500"><E id="apps_no_rows" def="لا توجد طلبات" site={site} setSite={setSite} editMode={editMode} /></td></tr>
+                )}
+              </CrudTable>
+
+              {canEdit && edit && (
+                <Card className="p-4 mt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold"><E id="apps_edit_title" def="تعديل طلب" site={site} setSite={setSite} editMode={editMode} /></h3>
+                    <div className="flex gap-2">
+                      <IconBtn onClick={saveEdit} defText="حفظ" editMode={editMode} site={site} setSite={setSite} id="btn_save" />
+                      <IconBtn onClick={()=>setEdit(null)} defText="إلغاء" editMode={editMode} site={site} setSite={setSite} id="btn_cancel" />
+                    </div>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <Field label="الاسم" value={edit.name||""} onChange={v=>setEdit({...edit, name:v})} editMode={editMode} site={site} setSite={setSite} id="apps_lbl_name" />
+                    <Field label="الهاتف" value={edit.phone||""} onChange={v=>setEdit({...edit, phone:v})} editMode={editMode} site={site} setSite={setSite} id="apps_lbl_phone" />
+                    <Field label="التحصيل الدراسي" value={edit.education||""} onChange={v=>setEdit({...edit, education:v})} editMode={editMode} site={site} setSite={setSite} id="apps_lbl_edu" />
+                    <Field label="السكن" value={edit.city||""} onChange={v=>setEdit({...edit, city:v})} editMode={editMode} site={site} setSite={setSite} id="apps_lbl_city" />
+                    <Field label="تاريخ التقديم" type="date" value={edit.date||""} onChange={v=>setEdit({...edit, date:v})} editMode={editMode} site={site} setSite={setSite} id="apps_lbl_date" />
+                    <SelectField label="الحالة" value={edit.status||"جديد"} onChange={v=>setEdit({...edit, status:v})}
+                      options={[{label:"جديد",value:"جديد"},{label:"مقبول",value:"مقبول"},{label:"مرفوض",value:"مرفوض"}]} editMode={editMode} site={site} setSite={setSite} id="apps_lbl_status" />
+                    <TextArea label="ملاحظات" value={edit.notes||""} onChange={v=>setEdit({...edit, notes:v})} editMode={editMode} site={site} setSite={setSite} id="apps_lbl_notes" />
+                  </div>
+                </Card>
+              )}
+            </Card>
+          </section>
+        );
+      }
+
+      // Apply / ApplyStatus
+      function Apply({data,setData, site, setSite, editMode}){
+        const [form,setForm]=useState({ date:new Date().toISOString().slice(0,10) });
+        const toMail = ()=>{
+          const body = encodeURIComponent(`الاسم: ${form.name||""}%0Aالهاتف: ${form.phone||""}%0Aالتحصيل الدراسي: ${form.education||""}%0االسكن: ${form.city||""}%0ا تاريخ التقديم: ${form.date||""}%0Aملاحظات: ${form.notes||""}`);
+          const url = `mailto:grdo2697@gmail.com?subject=${encodeURIComponent(site.texts?.mail_subject || "طلب توظيف جديد")}&body=${body}`;
+          window.location.href = url;
+        };
+        const save = ()=>{
+          if(!form.name || !form.phone) { alert("الاسم والهاتف مطلوبان"); return; }
+          const payload = { id:uid(), status:"جديد", ...form };
+          const next = {...data, applications:[...(data.applications||[]), payload]};
+          setData(next);
+          localStorage.setItem("az_last_applicant_v5", JSON.stringify(payload));
+          alert("تم إرسال الطلب. سيتم إعادتك لتسجيل الدخول.");
+          toMail();
+          window.location.hash = "login";
+        };
+        const onFile = (file)=>{ const reader = new FileReader(); reader.onload = ()=> setForm(prev=>({...prev, photo: reader.result })); reader.readAsDataURL(file); };
+        return (
+          <section className="space-y-3">
+            <Card className="p-5">
+              <h1 className="text-xl font-bold mb-3"><E id="apply_title" def="التقديم على وظيفة" site={site} setSite={setSite} editMode={editMode} /></h1>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Field label="الاسم" value={form.name||""} onChange={v=>setForm({...form, name:v})} required editMode={editMode} site={site} setSite={setSite} id="apply_lbl_name" />
+                <Field label="رقم الهاتف" value={form.phone||""} onChange={v=>setForm({...form, phone:v})} required editMode={editMode} site={site} setSite={setSite} id="apply_lbl_phone" />
+                <Field label="التحصيل الدراسي" value={form.education||""} onChange={v=>setForm({...form, education:v})} editMode={editMode} site={site} setSite={setSite} id="apply_lbl_edu" />
+                <Field label="تاريخ التقديم" type="date" value={form.date||""} onChange={v=>setForm({...form, date:v})} editMode={editMode} site={site} setSite={setSite} id="apply_lbl_date" />
+                <Field label="السكن" value={form.city||""} onChange={v=>setForm({...form, city:v})} editMode={editMode} site={site} setSite={setSite} id="apply_lbl_city" />
+                <TextArea label="ملاحظات" value={form.notes||""} onChange={v=>setForm({...form, notes:v})} editMode={editMode} site={site} setSite={setSite} id="apply_lbl_notes" />
+                <label className="block">
+                  <span className="text-sm"><E id="apply_lbl_photo" def="الصورة الشخصية" site={site} setSite={setSite} editMode={editMode} /></span>
+                  <input type="file" accept="image/*" onChange={(e)=>e.target.files[0] && onFile(e.target.files[0])} className="mt-1 w-full rounded-2xl border border-white/60 dark:border-white/10 bg-white/80 dark:bg-white/5 px-3 py-2"/>
+                  {form.photo && <img alt="preview" src={form.photo} className="mt-2 w-24 h-24 rounded-2xl object-cover border border-white/60 dark:border-white/10" />}
+                </label>
+              </div>
+              <div className="mt-4 flex gap-2">
+                <IconBtn onClick={save} defText="إرسال" editMode={editMode} site={site} setSite={setSite} id="apply_btn_send" className="bg-gradient-to-r from-brand-600 to-violet-600 text-white border-brand-600" />
+                <IconBtn onClick={()=>{ setForm({ date:new Date().toISOString().slice(0,10) }); }} defText="تفريغ" editMode={editMode} site={site} setSite={setSite} id="apply_btn_clear" />
+                <IconBtn onClick={()=>window.location.hash='myapp'} defText="حالة طلبي" editMode={editMode} site={site} setSite={setSite} id="apply_btn_status" />
+              </div>
+              <p className="text-xs text-slate-500 mt-2"><E id="apply_public_note" def="* هذه الصفحة عامة للجميع. بعد الإرسال سيتم إعادتك لتسجيل الدخول." site={site} setSite={setSite} editMode={editMode} /></p>
+            </Card>
+          </section>
+        );
+      }
+
+      function ApplyStatus({site,setSite, editMode}){
+        const [rec,setRec] = useState(()=>{
+          try{ return JSON.parse(localStorage.getItem("az_last_applicant_v5")||"null"); }catch{return null;}
+        });
+        return (
+          <section className="space-y-3">
+            <Card className="p-5">
+              <h1 className="text-xl font-bold mb-3"><E id="status_title" def="حالة الطلب" site={site} setSite={setSite} editMode={editMode} /></h1>
+              {rec ? (
+                <div className="grid sm:grid-cols-2 gap-3 text-sm">
+                  <div><b><E id="status_name" def="الاسم:" site={site} setSite={setSite} editMode={editMode} /></b> {rec.name}</div>
+                  <div><b><E id="status_phone" def="الهاتف:" site={site} setSite={setSite} editMode={editMode} /></b> {rec.phone}</div>
+                  <div><b><E id="status_edu" def="التحصيل الدراسي:" site={site} setSite={setSite} editMode={editMode} /></b> {rec.education||"—"}</div>
+                  <div><b><E id="status_city" def="السكن:" site={site} setSite={setSite} editMode={editMode} /></b> {rec.city||"—"}</div>
+                  <div><b><E id="status_date" def="تاريخ التقديم:" site={site} setSite={setSite} editMode={editMode} /></b> {rec.date||"—"}</div>
+                  <div><b><E id="status_state" def="الحالة:" site={site} setSite={setSite} editMode={editMode} /></b> {rec.status||"جديد"}</div>
+                  {rec.photo && <div className="sm:col-span-2"><b><E id="status_photo" def="الصورة:" site={site} setSite={setSite} editMode={editMode} /></b><br/><img src={rec.photo} alt="photo" className="mt-2 w-24 h-24 rounded-2xl object-cover border border-white/60 dark:border-white/10" /></div>}
+                  <div className="sm:col-span-2 text-xs text-slate-500 mt-2"><E id="status_local" def="* هذه البيانات محفوظة محليًا على جهازك." site={site} setSite={setSite} editMode={editMode} /></div>
+                </div>
+              ) : (
+                <div className="text-sm text-slate-600"><E id="status_empty" def="لا توجد بيانات. قدم طلبًا من صفحة التقديم." site={site} setSite={setSite} editMode={editMode} /></div>
+              )}
+            </Card>
+          </section>
+        );
+      }
+
+      // Admin (users, departments, positions, settings, site texts dump)
+      function Admin({users,setUsers,data,setData,site,setSite, editMode}){
+        const [selected,setSelected] = useState(null);
+        const [form,setForm] = useState({ username:"", password:"", permissions:[], linkedEmployeeId:"", restrictSelf:false });
+        const [deptInput,setDeptInput]=useState("");
+        const [posInput,setPosInput]=useState("");
+        const [hourRate,setHourRate]=useState(data.settings?.fineHourRate || 4000);
+        const [textsDump, setTextsDump] = useState(JSON.stringify(site.texts||{}, null, 2));
+
+        useEffect(()=>{ if(selected){ const u = users.find(x=>x.id===selected); if(u){ setForm({...u}); } } },[selected]);
+        useEffect(()=>{ setTextsDump(JSON.stringify(site.texts||{}, null, 2)); },[site.texts]);
+
+        const togglePerm = (k)=> setForm(prev => ({...prev, permissions: prev.permissions?.includes(k)? prev.permissions.filter(x=>x!==k) : [...(prev.permissions||[]), k]}));
+        const saveUser = ()=>{
+          if(!form.username || !form.password) return alert("اسم المستخدم وكلمة المرور مطلوبة");
+          if(form.id){ setUsers(users.map(u=>u.id===form.id? {...u, ...form}:u)); } else { setUsers([...users, { id:uid(), role:"staff", ...form }]); }
+          setSelected(null); setForm({ username:"", password:"", permissions:[], linkedEmployeeId:"", restrictSelf:false });
+          alert("تم حفظ المستخدم");
+        };
+        const removeUser = (id)=>{ if(!confirm("متأكد من الحذف؟")) return; setUsers(users.filter(u=>u.id!==id)); if(selected===id){ setSelected(null); setForm({ username:"", password:"", permissions:[], linkedEmployeeId:"", restrictSelf:false }); } };
+        const addDept = ()=> { if(!deptInput) return; if(data.departments.includes(deptInput)) return; setData({...data, departments:[...data.departments, deptInput]}); setDeptInput(""); };
+        const addPos  = ()=> { if(!posInput) return; if(data.positions.includes(posInput)) return; setData({...data, positions:[...data.positions, posInput]}); setPosInput(""); };
+        const removeDept = (d)=> setData({...data, departments: data.departments.filter(x=>x!==d)});
+        const removePos  = (p)=> setData({...data, positions: data.positions.filter(x=>x!==p)});
+        const saveHourRate = ()=> setData({...data, settings:{ ...(data.settings||{}), fineHourRate:Number(hourRate)||4000 }});
+        const applyTextsDump = ()=>{
+          try{
+            const obj = JSON.parse(textsDump||"{}");
+            setSite(prev=>({...prev, texts: obj }));
+            alert("تم تحديث النصوص.");
+          }catch{ alert("JSON غير صالح"); }
+        };
+
+        return (
+          <section className="space-y-6">
+            <Card className="p-5">
+              <h1 className="text-xl font-bold mb-3"><E id="admin_users_title" def="المستخدمون" site={site} setSite={setSite} editMode={editMode} /></h1>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <ul className="space-y-2">
+                    {users.map(u => (
+                      <li key={u.id} className="flex items-center justify-between bg-white/70 dark:bg-white/5 rounded-2xl p-2 border border-white/60 dark:border-white/10">
+                        <div className="font-medium">{u.username}</div>
+                        <div className="flex gap-2">
+                          <IconBtn onClick={()=>{ setSelected(u.id); setForm({...u}); }} defText="تعديل" editMode={editMode} site={site} setSite={setSite} id="btn_edit" />
+                          <IconBtn onClick={()=>removeUser(u.id)} defText="حذف" editMode={editMode} site={site} setSite={setSite} id="btn_delete" />
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2"><E id="admin_user_form_title" def="مستخدم جديد / تعديل مستخدم" site={site} setSite={setSite} editMode={editMode} /></h3>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <Field label="اسم المستخدم" value={form.username||""} onChange={v=>setForm({...form, username:v})} editMode={editMode} site={site} setSite={setSite} id="admin_lbl_username" />
+                    <Field label="كلمة المرور" value={form.password||""} onChange={v=>setForm({...form, password:v})} editMode={editMode} site={site} setSite={setSite} id="admin_lbl_password" />
+                    <SelectField label="ربط بموظف" value={form.linkedEmployeeId||""} onChange={v=>setForm({...form, linkedEmployeeId:v})} options={[{label:"—", value:""}, ...data.employees.map(e=>({label:e.name, value:e.id}))]} editMode={editMode} site={site} setSite={setSite} id="admin_lbl_link" />
+                    <label className="flex items-center gap-2 mt-6">
+                      <input type="checkbox" checked={!!form.restrictSelf} onChange={e=>setForm({...form, restrictSelf:e.target.checked})} />
+                      <span className="text-sm"><E id="admin_lbl_restrict" def="حصر العرض على الموظف المرتبط فقط" site={site} setSite={setSite} editMode={editMode} /></span>
+                    </label>
+                    <div className="sm:col-span-2">
+                      <div className="text-sm mb-2"><E id="admin_lbl_perms" def="الصلاحيات" site={site} setSite={setSite} editMode={editMode} /></div>
+                      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                        {PERMISSIONS.map(p => (
+                          <label key={p.key} className="flex items-center gap-2 rounded-xl border border-white/60 dark:border-white/10 px-3 py-2 bg-white/70 dark:bg-white/5">
+                            <input type="checkbox" checked={form.permissions?.includes(p.key) || form.permissions?.includes('*')} onChange={()=>togglePerm(p.key)} />
+                            <span className="text-sm">{p.label}</span>
+                          </label>
+                        ))}
+                        <label className="flex items-center gap-2 rounded-xl border border-white/60 dark:border-white/10 px-3 py-2 bg-white/70 dark:bg-white/5">
+                          <input type="checkbox" checked={form.permissions?.includes('*') } onChange={()=>togglePerm('*')} />
+                          <span className="text-sm"><E id="admin_perm_all" def="كل الصلاحيات" site={site} setSite={setSite} editMode={editMode} /></span>
+                        </label>
+                      </div>
+                    </div>
+                    <div className="sm:col-span-2"><IconBtn onClick={saveUser} defText="حفظ المستخدم" editMode={editMode} site={site} setSite={setSite} id="admin_btn_save_user" className="bg-gradient-to-r from-brand-600 to-violet-600 text-white border-brand-600" /></div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-5">
+              <h2 className="font-semibold mb-3"><E id="admin_dept_title" def="الأقسام" site={site} setSite={setSite} editMode={editMode} /></h2>
+              <div className="flex gap-2 mb-3">
+                <input className="rounded-2xl border border-white/60 dark:border-white/10 bg-white/80 dark:bg-white/5 px-3 py-2" value={deptInput} onChange={e=>setDeptInput(e.target.value)} placeholder="أدخل قسمًا"/>
+                <IconBtn onClick={addDept} defText="إضافة" editMode={editMode} site={site} setSite={setSite} id="admin_btn_add_dept" />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {data.departments.map(d => (<span key={d} className="px-3 py-1.5 rounded-2xl border border-white/60 dark:border-white/10 bg-white/70 dark:bg-white/5 text-sm flex items-center gap-2">{d} <button onClick={()=>removeDept(d)} className="text-rose-600">حذف</button></span>))}
+              </div>
+            </Card>
+
+            <Card className="p-5">
+              <h2 className="font-semibold mb-3"><E id="admin_pos_title" def="المناصب الوظيفية" site={site} setSite={setSite} editMode={editMode} /></h2>
+              <div className="flex gap-2 mb-3">
+                <input className="rounded-2xl border border-white/60 dark:border-white/10 bg-white/80 dark:bg-white/5 px-3 py-2" value={posInput} onChange={e=>setPosInput(e.target.value)} placeholder="أدخل منصبًا"/>
+                <IconBtn onClick={addPos} defText="إضافة" editMode={editMode} site={site} setSite={setSite} id="admin_btn_add_pos" />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {data.positions.map(p => (<span key={p} className="px-3 py-1.5 rounded-2xl border border-white/60 dark:border-white/10 bg-white/70 dark:bg-white/5 text-sm flex items-center gap-2">{p} <button onClick={()=>removePos(p)} className="text-rose-600">حذف</button></span>))}
+              </div>
+            </Card>
+
+            <Card className="p-5">
+              <h2 className="font-semibold mb-2"><E id="admin_settings_title" def="إعدادات" site={site} setSite={setSite} editMode={editMode} /></h2>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Field label="سعر الساعة الافتراضي للغرامات (د.ع)" type="number" value={hourRate} onChange={setHourRate} editMode={editMode} site={site} setSite={setSite} id="admin_lbl_hour_rate" />
+                <IconBtn onClick={saveHourRate} defText="حفظ الإعداد" editMode={editMode} site={site} setSite={setSite} id="admin_btn_save_rate" className="self-end" />
+              </div>
+            </Card>
+
+            <Card className="p-5">
+              <h2 className="font-semibold mb-2"><E id="admin_texts_title" def="محرر نصوص شامل (JSON)" site={site} setSite={setSite} editMode={editMode} /></h2>
+              <p className="text-sm text-slate-600 mb-2"><E id="admin_texts_hint" def="يمكنك تعديل جميع العناوين والتسميات من هنا. احفظ لتطبيق التغييرات." site={site} setSite={setSite} editMode={editMode} /></p>
+              <textarea className="w-full min-h-[220px] rounded-2xl border border-white/60 dark:border-white/10 bg-white/80 dark:bg-white/5 px-3 py-2 font-mono text-xs" value={textsDump} onChange={e=>setTextsDump(e.target.value)} />
+              <div className="mt-2"><IconBtn onClick={applyTextsDump} defText="تطبيق النصوص" editMode={editMode} site={site} setSite={setSite} id="admin_btn_apply_texts" /></div>
+            </Card>
+          </section>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+    </script>
+  </body>
+</html>
