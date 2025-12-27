@@ -1,0 +1,74 @@
+<div class="page-container" id="dashboardPage">
+  <section class="page-hero">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center page-hero-content" data-aos="fade-up">
+          <img src="assets/img/logo.png" class="hero-logo" alt="شعار الشركة" />
+          <h1>لوحة التحكم</h1>
+          <p class="lead">إدارة سريعة وواجهة حديثة</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page-content">
+    <div class="container">
+      <div class="kpi-grid mb-4">
+        <div class="kpi-card" data-aos="fade-up">
+          <div class="kpi-title">إجمالي المستخدمين</div>
+          <div class="kpi-value" id="totalUsers">0</div>
+        </div>
+        <div class="kpi-card" data-aos="fade-up" data-aos-delay="50">
+          <div class="kpi-title">إجمالي الموظفين</div>
+          <div class="kpi-value" id="totalEmployees">0</div>
+        </div>
+        <div class="kpi-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="kpi-title">العقود النشطة</div>
+          <div class="kpi-value" id="activeContractsCount">0</div>
+        </div>
+        <div class="kpi-card" data-aos="fade-up" data-aos-delay="150">
+          <div class="kpi-title">المركبات</div>
+          <div class="kpi-value" id="totalVehicles">0</div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-5">
+          <div class="card-modern" data-aos="fade-up">
+            <div class="card-modern__header">
+              <div>
+                <h3 class="mb-1">إجراءات سريعة</h3>
+                <p class="mb-0 text-muted">انتقل لإدارة الأقسام</p>
+              </div>
+              <span class="chip chip--soft"><i class="bi bi-lightning-charge"></i> سريع</span>
+            </div>
+            <div class="card-modern__body">
+              <div class="d-grid gap-2">
+                <button class="btn btn-primary" onclick="showPage('employees')"><i class="bi bi-people"></i> الموظفين</button>
+                <button class="btn btn-outline-primary" onclick="showPage('discounts')"><i class="bi bi-percent"></i> الخصومات</button>
+                <button class="btn btn-outline-primary" onclick="showPage('contracts')"><i class="bi bi-file-text"></i> العقود</button>
+                <button class="btn btn-outline-primary" onclick="showPage('vehicles')"><i class="bi bi-truck"></i> المركبات</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-7">
+          <div class="card-modern" data-aos="fade-up" data-aos-delay="80">
+            <div class="card-modern__header">
+              <div>
+                <h3 class="mb-1">آخر التحديثات</h3>
+                <p class="mb-0 text-muted">أحدث الأنشطة المسجلة</p>
+              </div>
+              <span class="chip chip--soft"><i class="bi bi-clock-history"></i> مباشر</span>
+            </div>
+            <div class="card-modern__body">
+              <div id="recentUpdates"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>

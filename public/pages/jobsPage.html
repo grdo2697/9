@@ -1,0 +1,103 @@
+<div class="page-container" id="jobsPage">
+<!-- Hero Section -->
+<section class="page-hero">
+<div class="container">
+<div class="row">
+<div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+<h1>الوظائف المتاحة</h1>
+<p class="lead">انضم إلى فريق عمل شركة العصر الذكي</p>
+</div>
+</div>
+</div>
+</section>
+<section class="page-content">
+<div class="container">
+<div class="guest-nav" data-aos="fade-up">
+<div class="d-flex justify-content-between align-items-center">
+<div>
+<h5 class="mb-0">مرحباً بك في صفحة الوظائف</h5>
+<p class="mb-0 text-muted">يمكنك التقديم على أي وظيفة من الوظائف المتاحة أدناه</p>
+</div>
+<div>
+<a class="btn btn-outline-light" href="#" onclick="showPage('home')">الصفحة الرئيسية</a>
+<a class="btn btn-outline-light" href="#" onclick="showPage('about')">عن الشركة</a>
+</div>
+</div>
+</div>
+<!-- Job Application Form -->
+<div class="service-card" data-aos="fade-up">
+<h3>التقديم على الوظائف</h3>
+<p>قم بملء النموذج التالي للتقديم على الوظائف المتاحة:</p>
+<form id="jobApplicationForm">
+<div class="row">
+<div class="col-md-6">
+<div class="form-group">
+<label class="form-label">الاسم الكامل *</label>
+<input class="form-control" id="applicantName" required="" type="text"/>
+</div>
+</div>
+<div class="col-md-6">
+<div class="form-group">
+<label class="form-label">البريد الإلكتروني *</label>
+<input class="form-control" id="applicantEmail" required="" type="email"/>
+</div>
+</div>
+</div>
+<div class="row">
+<div class="col-md-6">
+<div class="form-group">
+<label class="form-label">رقم الهاتف *</label>
+<input class="form-control" id="applicantPhone" required="" type="tel"/>
+</div>
+</div>
+<div class="col-md-6">
+<div class="form-group">
+<label class="form-label">الوظيفة المطلوبة *</label>
+<select class="form-control" id="applicantJob" required="">
+<option value="">اختر الوظيفة</option>
+<option value="مهندس برمجيات">مهندس برمجيات</option>
+<option value="مدير مشاريع">مدير مشاريع</option>
+<option value="مصمم جرافيك">مصمم جرافيك</option>
+<option value="محاسب">محاسب</option>
+<option value="مدخل بيانات">مدخل بيانات</option>
+<option value="مدير تسويق">مدير تسويق</option>
+<option value="موظف دعم فني">موظف دعم فني</option>
+<option value="أخرى">أخرى</option>
+</select>
+</div>
+</div>
+</div>
+<div class="form-group">
+<label class="form-label">السيرة الذاتية (اختياري)</label>
+<input accept=".pdf,.doc,.docx" class="form-control" id="applicantCV" type="file"/>
+<small class="text-muted">يمكنك رفع ملف PDF أو Word بحجم لا يتجاوز 5MB</small>
+</div>
+<div class="form-group">
+<label class="form-label">رسالة التقديم *</label>
+<textarea class="form-control" id="applicantMessage" placeholder="أخبرنا عن نفسك وخبراتك وأسباب رغبتك في الانضمام إلينا..." required="" rows="4"></textarea>
+</div>
+<div class="form-group">
+<label class="form-label">ملاحظات إضافية</label>
+<textarea class="form-control" id="applicantNotes" placeholder="أي معلومات إضافية تريد إضافتها..." rows="2"></textarea>
+</div>
+<div class="form-group">
+<div class="form-check">
+<input class="form-check-input" id="agreeTerms" required="" type="checkbox"/>
+<label class="form-check-label" for="agreeTerms">
+                                        أوافق على شروط التقديم وخصوصية البيانات
+                                    </label>
+</div>
+</div>
+<button class="btn btn-primary" type="submit">تقديم الطلب</button>
+</form>
+</div>
+<!-- Available Jobs -->
+<div class="service-card mt-4" data-aos="fade-up" data-aos-delay="100">
+<h3>الوظائف المفتوحة</h3>
+<div id="availableJobs">
+<!-- Jobs will be loaded by JavaScript -->
+</div>
+</div>
+</div>
+</section>
+</div>

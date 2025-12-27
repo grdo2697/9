@@ -1,0 +1,136 @@
+<div class="page-container" id="profilePage">
+  <section class="page-hero page-hero--compact">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+          <img src="assets/img/logo.png" class="hero-logo" alt="شعار الشركة"/>
+          <h1>الملف الشخصي</h1>
+          <p class="lead">إدارة معلومات حسابك وتحديث بياناتك بسهولة</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page-content">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="card-modern card-profile" data-aos="fade-up">
+            <div class="card-modern__watermark">
+              <img src="assets/img/logo.png" alt="logo watermark">
+            </div>
+            <div class="card-modern__body text-center">
+              <div class="profile-avatar" id="profileAvatar" aria-label="avatar"></div>
+              <div class="mt-3">
+                <label class="btn btn-sm btn-outline-primary mb-2" for="profileAvatarFile">
+                  <i class="bi bi-image"></i> تغيير الصورة
+                </label>
+                <input id="profileAvatarFile" type="file" accept="image/*" style="display:none" />
+                <button class="btn btn-sm btn-outline-secondary mb-2" type="button" onclick="removeProfileAvatar()">
+                  <i class="bi bi-x-circle"></i> حذف
+                </button>
+              </div>
+              <h3 class="mt-3 mb-1" id="profileName"></h3>
+              <div class="text-muted mb-2" id="profileEmail"></div>
+              <div class="employee-type-badge d-inline-block" id="profileRoleBadge"></div>
+
+              <div class="profile-meta mt-4">
+                <div class="profile-meta__item">
+                  <div class="profile-meta__label">الحالة</div>
+                  <div class="profile-meta__value">نشط</div>
+                </div>
+                <div class="profile-meta__item">
+                  <div class="profile-meta__label">الدور</div>
+                  <div class="profile-meta__value" id="profileRoleText">—</div>
+                </div>
+              </div>
+
+              <div class="d-grid gap-2 mt-4">
+                <button class="btn btn-outline-primary" type="button" onclick="showPage('myInfo')">
+                  <i class="bi bi-person-lines-fill"></i> معلوماتي
+                </button>
+                <button class="btn btn-primary" type="button" onclick="document.getElementById('profileNameInput')?.focus()">
+                  <i class="bi bi-pencil-square"></i> تعديل البيانات
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <div class="card-modern" data-aos="fade-up" data-aos-delay="100">
+            <div class="card-modern__header">
+              <div>
+                <h3 class="mb-1">تعديل المعلومات</h3>
+                <p class="mb-0 text-muted">حدّث بياناتك، ثم اضغط حفظ</p>
+              </div>
+              <span class="chip chip--soft"><i class="bi bi-shield-check"></i> آمن</span>
+            </div>
+
+            <div class="card-modern__body">
+              <form id="profileForm" class="form-modern">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label">الاسم الكامل</label>
+                    <input class="form-control" id="profileNameInput" type="text" placeholder="اكتب اسمك الكامل"/>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label">البريد الإلكتروني</label>
+                    <input class="form-control" id="profileEmailInput" type="email" placeholder="name@email.com"/>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label">رقم الهاتف</label>
+                    <input class="form-control" id="profilePhoneInput" type="tel" placeholder="07xxxxxxxxx"/>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label">ملاحظات</label>
+                    <input class="form-control" id="profileNotesInput" type="text" placeholder="اختياري"/>
+                  </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                  <button class="btn btn-primary" type="submit">
+                    <i class="bi bi-save"></i> حفظ التغييرات
+                  </button>
+                  <button class="btn btn-outline-secondary" type="button" onclick="loadUserData()">
+                    <i class="bi bi-arrow-counterclockwise"></i> إعادة تحميل
+                  </button>
+                </div>
+              </form>
+
+              <div class="alert alert-info mt-4 mb-0">
+                <i class="bi bi-info-circle"></i>
+                إذا تريد تغيّر الصلاحيات أو الدور، هذا يتم من قبل الإدارة.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  
+    <hr class="my-4"/>
+    <h4 class="mb-3">الأمان</h4>
+    <form id="passwordForm" class="row g-3">
+      <div class="col-lg-4">
+        <label class="form-label">كلمة المرور الحالية</label>
+        <input type="password" class="form-control" id="profileCurrentPassword" placeholder="••••••••">
+      </div>
+      <div class="col-lg-4">
+        <label class="form-label">كلمة المرور الجديدة</label>
+        <input type="password" class="form-control" id="profileNewPassword" placeholder="••••••••">
+      </div>
+      <div class="col-lg-4">
+        <label class="form-label">تأكيد كلمة المرور</label>
+        <input type="password" class="form-control" id="profileConfirmPassword" placeholder="••••••••">
+      </div>
+      <div class="col-12">
+        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-shield-lock"></i> تغيير كلمة المرور</button>
+      </div>
+    </form>
+    
+  </section>
+</div>

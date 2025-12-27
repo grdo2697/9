@@ -1,0 +1,80 @@
+<div class="page-container" id="permissionsPage">
+<section class="page-hero">
+<div class="container">
+<div class="row">
+<div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+<h1>إدارة الصلاحيات</h1>
+<p class="lead">التحكم الكامل في ما يراه كل نوع من المستخدمين</p>
+</div>
+</div>
+</div>
+</section>
+<section class="page-content">
+<div class="container">
+<!-- Search and Filter Section -->
+<div class="search-filter-container" data-aos="fade-up">
+<div class="row">
+<div class="col-md-8">
+<div class="search-box">
+<input class="form-control" id="permissionsSearch" placeholder="ابحث باسم الدور أو الوصف..." type="text"/>
+<i class="bi bi-search"></i>
+</div>
+</div>
+<div class="col-md-4">
+<button class="btn btn-primary w-100" onclick="showAddRoleModal()">إضافة دور جديد</button>
+</div>
+</div>
+</div>
+<div class="service-card" data-aos="fade-up">
+<h3>أنواع المستخدمين</h3>
+<div class="roles-container" id="rolesContainer">
+<!-- Will be populated by JS -->
+</div>
+</div>
+<div class="service-card mt-4" data-aos="fade-up" data-aos-delay="100">
+<h3>إدارة صلاحيات الصفحات</h3>
+<div class="permissions-grid" id="pagesPermissions">
+<!-- Will be populated by JS -->
+</div>
+</div>
+
+<div class="service-card mt-4" data-aos="fade-up" data-aos-delay="150">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+    <div>
+      <h3 class="mb-1">إدارة صلاحيات المستخدمين</h3>
+      <p class="mb-0 text-muted">اختَر مستخدم وحدد بالضبط شنو يطلعله (صفحات) وشنو يقدر يسوي (إضافة/تعديل/حذف).</p>
+    </div>
+    <div style="min-width: 260px;">
+      <select class="form-control" id="userPermissionsSelect">
+        <option value="">اختر المستخدم</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="mt-3" id="userPermissionsHint">
+    <div class="alert alert-info mb-0">اختَر مستخدم من القائمة حتى تظهر صلاحياته.</div>
+  </div>
+
+  <div class="table-responsive mt-3" id="userPermissionsTableWrap" style="display:none;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>الصفحة</th>
+          <th class="text-center">إظهار</th>
+          <th class="text-center">إضافة</th>
+          <th class="text-center">تعديل</th>
+          <th class="text-center">حذف</th>
+        </tr>
+      </thead>
+      <tbody id="userPermissionsTableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2 mt-3" id="userPermissionsActions" style="display:none;">
+    <button class="btn btn-outline-secondary" onclick="resetSelectedUserPermissions()">إرجاع افتراضي (حسب الدور)</button>
+    <button class="btn btn-primary" onclick="saveSelectedUserPermissions()">حفظ صلاحيات المستخدم</button>
+  </div>
+</div>
+</div>
+</section>
+</div>

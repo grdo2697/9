@@ -1,0 +1,71 @@
+<div class="page-container" id="usersPage">
+<section class="page-hero">
+<div class="container">
+<div class="row">
+<div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+<h1>إدارة المستخدمين</h1>
+<p class="lead">إدارة حسابات المستخدمين والتحكم في الصلاحيات</p>
+</div>
+</div>
+</div>
+</section>
+<section class="page-content">
+<div class="container">
+<!-- Search and Filter Section -->
+<div class="search-filter-container" data-aos="fade-up">
+<div class="row">
+<div class="col-md-6">
+<div class="search-box">
+<input class="form-control" id="usersSearch" placeholder="ابحث بالاسم أو البريد الإلكتروني..." type="text"/>
+<i class="bi bi-search"></i>
+</div>
+</div>
+<div class="col-md-3">
+<select class="form-control" id="usersRoleFilter">
+<option value="">جميع الأدوار</option>
+<option value="admin">مدير النظام</option>
+<option value="manager">مدير قسم</option>
+<option value="hr">موارد بشرية</option>
+<option value="employee">موظف</option>
+</select>
+</div>
+<div class="col-md-3">
+<select class="form-control" id="usersStatusFilter">
+<option value="">جميع الحالات</option>
+<option value="active">نشط</option>
+<option value="inactive">غير نشط</option>
+</select>
+</div>
+</div>
+</div>
+<div class="service-card" data-aos="fade-up">
+<div class="d-flex justify-content-between align-items-center mb-4">
+<h3 class="mb-0">قائمة المستخدمين</h3>
+<button class="btn btn-primary" onclick="showAddUserModal()">إضافة مستخدم جديد</button>
+</div>
+<div class="table-responsive">
+<table class="users-table">
+<thead>
+<tr>
+<th>الاسم</th>
+<th>البريد الإلكتروني</th>
+<th>رقم الهاتف</th>
+<th>نوع الحساب</th>
+<th>الموظف المرتبط</th>
+<th>تاريخ التسجيل</th>
+<th>الإجراءات</th>
+</tr>
+</thead>
+<tbody id="usersTableBody">
+<!-- Will be populated by JS -->
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="pagination-container" id="usersPagination">
+<!-- Pagination will be added by JavaScript -->
+</div>
+</div>
+</div>
+</section>
+</div>

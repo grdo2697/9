@@ -1,0 +1,1762 @@
+<div class="page-container" id="myDiscountsPage">
+  <!-- Hero Section -->
+  <section class="page-hero">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+          <h1>خصوماتي</h1>
+          <p class="lead">عرض وإدارة جميع الخصومات المطبقة على راتبي</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page-content">
+    <div class="container">
+      <!-- بطاقة الإضافة -->
+      <div class="service-card mb-4" data-aos="fade-up">
+        <div class="card-header-with-action">
+          <h3>إضافة خصم جديد</h3>
+          <button class="btn btn-primary" onclick="toggleAddDiscountForm()">
+            <i class="bi bi-plus-circle"></i> إضافة خصم
+          </button>
+        </div>
+        
+        <!-- نموذج إضافة خصم جديد (مخفي افتراضيًا) -->
+        <div class="add-discount-form" id="addDiscountForm" style="display: none;">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">نوع الخصم</label>
+              <div class="input-with-button">
+                <select class="form-control" id="newDiscountType">
+                  <option value="">اختر نوع الخصم</option>
+                  <option value="تأمين">تأمين</option>
+                  <option value="قرض">قرض</option>
+                  <option value="غياب">غياب</option>
+                  <option value="جزاءات">جزاءات</option>
+                  <option value="تأخير">تأخير</option>
+                  <option value="أخرى">أخرى</option>
+                </select>
+                <button class="btn btn-outline-secondary btn-sm" onclick="showAddTypeModal()" type="button">
+                  <i class="bi bi-plus"></i>
+                </button>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">المبلغ</label>
+              <div class="input-group">
+                <input class="form-control" id="newDiscountAmount" type="number" placeholder="المبلغ" />
+                <span class="input-group-text">IQD</span>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">الشهر</label>
+              <div class="input-with-button">
+                <select class="form-control" id="newDiscountMonth">
+                  <option value="">اختر الشهر</option>
+                  <option value="يناير">يناير</option>
+                  <option value="فبراير">فبراير</option>
+                  <option value="مارس">مارس</option>
+                  <option value="أبريل">أبريل</option>
+                  <option value="مايو">مايو</option>
+                  <option value="يونيو">يونيو</option>
+                  <option value="يوليو">يوليو</option>
+                  <option value="أغسطس">أغسطس</option>
+                  <option value="سبتمبر">سبتمبر</option>
+                  <option value="أكتوبر">أكتوبر</option>
+                  <option value="نوفمبر">نوفمبر</option>
+                  <option value="ديسمبر">ديسمبر</option>
+                </select>
+                <button class="btn btn-outline-secondary btn-sm" onclick="showMonthPicker()" type="button">
+                  <i class="bi bi-calendar"></i>
+                </button>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">السنة</label>
+              <select class="form-control" id="newDiscountYear">
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">التاريخ</label>
+              <div class="date-input-container">
+                <div class="date-input-group">
+                  <input class="form-control date-input manual-date" id="newDiscountDate" type="text" placeholder="يوم/شهر/سنة" />
+                  <button class="btn btn-outline-secondary" type="button" onclick="showDatePicker()">
+                    <i class="bi bi-calendar-date"></i>
+                  </button>
+                </div>
+                <div class="date-format-hint">الصيغة: يوم/شهر/سنة (مثال: 15/10/2024)</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">الحالة</label>
+              <select class="form-control" id="newDiscountStatus">
+                <option value="مفعل">مفعل</option>
+                <option value="معلق">معلق</option>
+                <option value="ملغى">ملغى</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">القسم</label>
+              <div class="input-with-button">
+                <select class="form-control" id="newDiscountCategory">
+                  <option value="">اختر القسم</option>
+                  <option value="رواتب">رواتب</option>
+                  <option value="مستحقات">مستحقات</option>
+                  <option value="مخصصات">مخصصات</option>
+                  <option value="خصومات">خصومات</option>
+                </select>
+                <button class="btn btn-outline-secondary btn-sm" onclick="showAddCategoryModal()" type="button">
+                  <i class="bi bi-plus"></i>
+                </button>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">الملاحظات</label>
+              <textarea class="form-control" id="newDiscountNotes" rows="2" placeholder="أضف ملاحظات حول الخصم..."></textarea>
+            </div>
+            <div class="col-12">
+              <div class="form-actions">
+                <button class="btn btn-primary" type="button" onclick="addNewDiscount()">
+                  <i class="bi bi-check-circle"></i> حفظ الخصم
+                </button>
+                <button class="btn btn-outline-secondary" type="button" onclick="toggleAddDiscountForm()">
+                  <i class="bi bi-x-circle"></i> إلغاء
+                </button>
+                <button class="btn btn-outline-info" type="button" onclick="clearDiscountForm()">
+                  <i class="bi bi-eraser"></i> مسح النموذج
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search and Filter Section -->
+      <div class="search-filter-container" data-aos="fade-up">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="search-box">
+              <input class="form-control" id="myDiscountsSearch" placeholder="ابحث بنوع الخصم أو الشهر أو الملاحظات..." type="text"/>
+              <i class="bi bi-search"></i>
+              <button class="btn btn-clear-search" id="clearDiscountSearch" onclick="clearDiscountSearch()">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <select class="form-control" id="myDiscountsYearFilter">
+              <option value="">جميع السنوات</option>
+              <option value="2024">2026</option>
+              <option value="2023">2025</option>
+              <option value="2022">2024</option>
+              <option value="2021">2023</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <select class="form-control" id="myDiscountsStatusFilter">
+              <option value="">جميع الحالات</option>
+              <option value="مفعل">مفعل</option>
+              <option value="ملغى">ملغى</option>
+              <option value="معلق">معلق</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <select class="form-control" id="myDiscountsCategoryFilter">
+              <option value="">جميع الأقسام</option>
+              <option value="رواتب">رواتب</option>
+              <option value="مستحقات">مستحقات</option>
+              <option value="مخصصات">مخصصات</option>
+              <option value="خصومات">خصومات</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-md-12">
+            <div class="filter-tags" id="discountFilterTags"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- بطاقة عرض الخصومات -->
+      <div class="service-card" data-aos="fade-up">
+        <div class="card-header-with-action">
+          <h3>الخصومات الشهرية</h3>
+          <div class="table-info">
+            <span class="badge bg-primary" id="discountsCount">0 خصم</span>
+            <button class="btn btn-sm btn-outline-secondary" onclick="exportDiscounts()">
+              <i class="bi bi-download"></i> تصدير
+            </button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>الشهر</th>
+                <th>نوع الخصم</th>
+                <th>المبلغ</th>
+                <th>الحالة</th>
+                <th>التاريخ</th>
+                <th>القسم</th>
+                <th>ملاحظات</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="myDiscountsTableBody">
+              <!-- سيتم تعبئتها بواسطة JavaScript -->
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"><strong>المجموع:</strong></td>
+                <td><strong id="discountsTotal">0 IQD</strong></td>
+                <td colspan="5"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        
+        <!-- حالة عدم وجود بيانات -->
+        <div class="empty-state" id="noDiscountsState" style="display: none;">
+          <div class="empty-icon">
+            <i class="bi bi-percent"></i>
+          </div>
+          <h4>لا توجد خصومات</h4>
+          <p>لم يتم إضافة أي خصومات بعد. ابدأ بإضافة خصم جديد.</p>
+          <button class="btn btn-primary" onclick="toggleAddDiscountForm()">
+            <i class="bi bi-plus-circle"></i> إضافة خصم جديد
+          </button>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container" id="myDiscountsPagination">
+          <!-- سيتم إضافة ترقيم الصفحات بواسطة JavaScript -->
+        </div>
+      </div>
+
+      <!-- بطاقة الإحصائيات -->
+      <div class="service-card mt-4" data-aos="fade-up" data-aos-delay="100">
+        <h3>ملخص الخصومات السنوي</h3>
+        <div class="stats-cards">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="stat-number" id="myTotalDiscounts">0 <span class="currency">IQD</span></div>
+            <div class="stat-label">إجمالي الخصومات</div>
+            <div class="stat-trend" id="totalDiscountsTrend">
+              <i class="bi bi-arrow-up"></i> 0%
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="bi bi-calendar-month"></i>
+            </div>
+            <div class="stat-number" id="myMonthlyAverage">0 <span class="currency">IQD</span></div>
+            <div class="stat-label">المعدل الشهري</div>
+            <div class="stat-trend" id="monthlyAverageTrend">
+              <i class="bi bi-dash"></i> 0%
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="bi bi-calendar-check"></i>
+            </div>
+            <div class="stat-number" id="myLastMonthDiscount">0 <span class="currency">IQD</span></div>
+            <div class="stat-label">آخر شهر</div>
+            <div class="stat-trend" id="lastMonthTrend">
+              <i class="bi bi-dash"></i> 0%
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="bi bi-list-check"></i>
+            </div>
+            <div class="stat-number" id="activeDiscountsCount">0</div>
+            <div class="stat-label">خصومات مفعلة</div>
+            <div class="stat-trend">
+              <span class="badge bg-success">نشط</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- رسم بياني مبسط -->
+        <div class="chart-container mt-4">
+          <h5>توزيع الخصومات حسب النوع</h5>
+          <div class="chart-placeholder" id="discountsChart">
+            <!-- سيتم إضافة الرسم البياني بواسطة JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Modal لإضافة نوع خصم جديد -->
+<div class="modal fade" id="addTypeModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">إضافة نوع خصم جديد</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">اسم نوع الخصم</label>
+          <input class="form-control" id="newTypeName" placeholder="أدخل اسم نوع الخصم الجديد" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">وصف النوع</label>
+          <textarea class="form-control" id="newTypeDescription" rows="2" placeholder="وصف مختصر لنوع الخصم"></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">القسم</label>
+          <select class="form-control" id="newTypeCategory">
+            <option value="خصومات">خصومات</option>
+            <option value="رواتب">رواتب</option>
+            <option value="مستحقات">مستحقات</option>
+            <option value="مخصصات">مخصصات</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+        <button type="button" class="btn btn-primary" onclick="saveNewType()">حفظ النوع</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal لإضافة قسم جديد -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">إضافة قسم جديد</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">اسم القسم</label>
+          <input class="form-control" id="newCategoryName" placeholder="أدخل اسم القسم الجديد" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">وصف القسم</label>
+          <textarea class="form-control" id="newCategoryDescription" rows="2" placeholder="وصف مختصر للقسم"></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">لون القسم</label>
+          <div class="color-picker">
+            <button class="color-option" style="background-color: #3498db;" onclick="selectCategoryColor('#3498db')"></button>
+            <button class="color-option" style="background-color: #2ecc71;" onclick="selectCategoryColor('#2ecc71')"></button>
+            <button class="color-option" style="background-color: #e74c3c;" onclick="selectCategoryColor('#e74c3c')"></button>
+            <button class="color-option" style="background-color: #f39c12;" onclick="selectCategoryColor('#f39c12')"></button>
+            <button class="color-option" style="background-color: #9b59b6;" onclick="selectCategoryColor('#9b59b6')"></button>
+          </div>
+          <input type="hidden" id="selectedCategoryColor" value="#3498db" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+        <button type="button" class="btn btn-primary" onclick="saveNewCategory()">حفظ القسم</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal لاختيار التاريخ -->
+<div class="modal fade" id="datePickerModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">اختر التاريخ</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="date-picker-container">
+          <div class="month-selector">
+            <button class="btn btn-sm btn-outline-secondary" onclick="changeMonth(-1)">
+              <i class="bi bi-chevron-right"></i>
+            </button>
+            <div class="current-month" id="currentMonthYear">يناير 2024</div>
+            <button class="btn btn-sm btn-outline-secondary" onclick="changeMonth(1)">
+              <i class="bi bi-chevron-left"></i>
+            </button>
+          </div>
+          <div class="calendar">
+            <div class="calendar-header">
+              <div>أح</div>
+              <div>إث</div>
+              <div>ث</div>
+              <div>أر</div>
+              <div>خ</div>
+              <div>ج</div>
+              <div>س</div>
+            </div>
+            <div class="calendar-days" id="calendarDays">
+              <!-- سيتم تعبئتها بواسطة JavaScript -->
+            </div>
+          </div>
+          <div class="date-input-group mt-3">
+            <input class="form-control" id="manualDateInput" placeholder="يوم/شهر/سنة" />
+            <button class="btn btn-primary" onclick="setManualDate()">تعيين</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+        <button type="button" class="btn btn-primary" onclick="applySelectedDate()">تطبيق</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* تحسينات التصميم */
+  .card-header-with-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .table-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .add-discount-form {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 15px;
+    border: 1px solid #e9ecef;
+  }
+  
+  .input-with-button {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .input-with-button select {
+    flex: 1;
+  }
+  
+  .date-input-container {
+    position: relative;
+  }
+  
+  .date-input-group {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .date-input-group .form-control {
+    flex: 1;
+  }
+  
+  .date-format-hint {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 5px;
+  }
+  
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  
+  .search-box {
+    position: relative;
+  }
+  
+  .search-box i {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+  }
+  
+  .btn-clear-search {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6c757d;
+    display: none;
+  }
+  
+  .filter-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  
+  .filter-tag {
+    background-color: #e9ecef;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .filter-tag .remove-tag {
+    background: none;
+    border: none;
+    color: #6c757d;
+    font-size: 1rem;
+    padding: 0;
+    line-height: 1;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+  }
+  
+  .empty-icon {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 1rem;
+  }
+  
+  .empty-state h4 {
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+  }
+  
+  .empty-state p {
+    color: #adb5bd;
+    margin-bottom: 1.5rem;
+  }
+  
+  .stat-card {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #e9ecef;
+    position: relative;
+  }
+  
+  .stat-icon {
+    font-size: 2rem;
+    color: #3498db;
+    margin-bottom: 10px;
+  }
+  
+  .stat-number {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+  
+  .stat-label {
+    color: #6c757d;
+    margin-top: 5px;
+  }
+  
+  .stat-trend {
+    margin-top: 10px;
+    font-size: 0.85rem;
+  }
+  
+  .stat-trend .bi-arrow-up {
+    color: #2ecc71;
+  }
+  
+  .stat-trend .bi-arrow-down {
+    color: #e74c3c;
+  }
+  
+  .chart-container {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+  }
+  
+  .chart-placeholder {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+  }
+  
+  .color-picker {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .color-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+  }
+  
+  .color-option.active {
+    border-color: #2c3e50;
+  }
+  
+  .date-picker-container {
+    text-align: center;
+  }
+  
+  .month-selector {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .current-month {
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  
+  .calendar {
+    margin-bottom: 20px;
+  }
+  
+  .calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  
+  .calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+  }
+  
+  .calendar-day {
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .calendar-day:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .calendar-day.selected {
+    background-color: #3498db;
+    color: white;
+  }
+  
+  .calendar-day.other-month {
+    color: #adb5bd;
+  }
+  
+  .data-table tfoot {
+    background-color: #f8f9fa;
+  }
+  
+  .status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  
+  .status-active {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .status-cancelled {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  
+  .status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  
+  @media (max-width: 768px) {
+    .card-header-with-action {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .table-info {
+      align-self: flex-end;
+    }
+    
+    .form-actions {
+      flex-direction: column;
+    }
+    
+    .form-actions button {
+      width: 100%;
+    }
+    
+    .stats-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>
+
+<script>
+  // بيانات الخصومات (سيتم تحميلها من localStorage)
+  let myDiscounts = [];
+  let discountTypes = ['تأمين', 'قرض', 'غياب', 'جزاءات', 'تأخير', 'أخرى'];
+  let discountCategories = ['رواتب', 'مستحقات', 'مخصصات', 'خصومات'];
+  let currentPage = 1;
+  const itemsPerPage = 10;
+  let currentDate = new Date();
+  let selectedDate = null;
+
+  // تهيئة الصفحة
+  document.addEventListener('DOMContentLoaded', function() {
+    loadDiscounts();
+    renderDiscountsTable();
+    updateDiscountStats();
+    setupEventListeners();
+    initializeDatePicker();
+  });
+
+  // تحميل الخصومات من localStorage
+  function loadDiscounts() {
+    const savedDiscounts = localStorage.getItem('myDiscounts');
+    if (savedDiscounts) {
+      myDiscounts = JSON.parse(savedDiscounts);
+    } else {
+      // إنشاء بيانات تجريبية
+      myDiscounts = [
+        {
+          id: 1,
+          month: 'يناير',
+          year: '2024',
+          type: 'تأمين',
+          amount: 50000,
+          status: 'مفعل',
+          date: '15/01/2024',
+          category: 'خصومات',
+          notes: 'خصم التأمين الشهري'
+        },
+        {
+          id: 2,
+          month: 'يناير',
+          year: '2024',
+          type: 'قرض',
+          amount: 100000,
+          status: 'مفعل',
+          date: '20/01/2024',
+          category: 'مستحقات',
+          notes: 'قسط القرض الشهري'
+        },
+        {
+          id: 3,
+          month: 'فبراير',
+          year: '2024',
+          type: 'غياب',
+          amount: 25000,
+          status: 'ملغى',
+          date: '05/02/2024',
+          category: 'خصومات',
+          notes: 'غياب يوم واحد'
+        },
+        {
+          id: 4,
+          month: 'فبراير',
+          year: '2024',
+          type: 'تأخير',
+          amount: 15000,
+          status: 'مفعل',
+          date: '10/02/2024',
+          category: 'جزاءات',
+          notes: 'تأخير عن الدوام'
+        },
+        {
+          id: 5,
+          month: 'مارس',
+          year: '2024',
+          type: 'أخرى',
+          amount: 30000,
+          status: 'معلق',
+          date: '15/03/2024',
+          category: 'أخرى',
+          notes: 'خصم متنوع'
+        }
+      ];
+      saveDiscounts();
+    }
+    
+    // تحميل الأنواع
+    const savedTypes = localStorage.getItem('discountTypes');
+    if (savedTypes) {
+      discountTypes = JSON.parse(savedTypes);
+      updateTypeSelect();
+    }
+    
+    // تحميل الأقسام
+    const savedCategories = localStorage.getItem('discountCategories');
+    if (savedCategories) {
+      discountCategories = JSON.parse(savedCategories);
+      updateCategorySelect();
+    }
+  }
+
+  // حفظ الخصومات في localStorage
+  function saveDiscounts() {
+    localStorage.setItem('myDiscounts', JSON.stringify(myDiscounts));
+  }
+
+  // حفظ الأنواع في localStorage
+  function saveTypes() {
+    localStorage.setItem('discountTypes', JSON.stringify(discountTypes));
+  }
+
+  // حفظ الأقسام في localStorage
+  function saveCategories() {
+    localStorage.setItem('discountCategories', JSON.stringify(discountCategories));
+  }
+
+  // إعداد مستمعي الأحداث
+  function setupEventListeners() {
+    // البحث
+    document.getElementById('myDiscountsSearch').addEventListener('input', function() {
+      currentPage = 1;
+      renderDiscountsTable();
+      updateFilterTags();
+    });
+    
+    // الفلاتر
+    document.getElementById('myDiscountsYearFilter').addEventListener('change', function() {
+      currentPage = 1;
+      renderDiscountsTable();
+      updateFilterTags();
+    });
+    
+    document.getElementById('myDiscountsStatusFilter').addEventListener('change', function() {
+      currentPage = 1;
+      renderDiscountsTable();
+      updateFilterTags();
+    });
+    
+    document.getElementById('myDiscountsCategoryFilter').addEventListener('change', function() {
+      currentPage = 1;
+      renderDiscountsTable();
+      updateFilterTags();
+    });
+    
+    // التحقق من صيغة التاريخ يدويًا
+    document.getElementById('newDiscountDate').addEventListener('blur', function() {
+      validateDateInput(this);
+    });
+  }
+
+  // عرض/إخفاء نموذج إضافة خصم جديد
+  function toggleAddDiscountForm() {
+    const form = document.getElementById('addDiscountForm');
+    if (form.style.display === 'none' || form.style.display === '') {
+      form.style.display = 'block';
+      // تعيين التاريخ الحالي كقيمة افتراضية
+      const today = new Date();
+      const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+      document.getElementById('newDiscountDate').value = formattedDate;
+    } else {
+      form.style.display = 'none';
+    }
+  }
+
+  // مسح نموذج الخصم
+  function clearDiscountForm() {
+    document.getElementById('newDiscountType').value = '';
+    document.getElementById('newDiscountAmount').value = '';
+    document.getElementById('newDiscountMonth').value = '';
+    document.getElementById('newDiscountYear').value = '2024';
+    document.getElementById('newDiscountDate').value = '';
+    document.getElementById('newDiscountStatus').value = 'مفعل';
+    document.getElementById('newDiscountCategory').value = '';
+    document.getElementById('newDiscountNotes').value = '';
+    
+    // تعيين التاريخ الحالي
+    const today = new Date();
+    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+    document.getElementById('newDiscountDate').value = formattedDate;
+  }
+
+  // إضافة خصم جديد
+  function addNewDiscount() {
+    const type = document.getElementById('newDiscountType').value;
+    const amount = parseFloat(document.getElementById('newDiscountAmount').value);
+    const month = document.getElementById('newDiscountMonth').value;
+    const year = document.getElementById('newDiscountYear').value;
+    const date = document.getElementById('newDiscountDate').value;
+    const status = document.getElementById('newDiscountStatus').value;
+    const category = document.getElementById('newDiscountCategory').value;
+    const notes = document.getElementById('newDiscountNotes').value;
+    
+    // التحقق من الحقول المطلوبة
+    if (!type || !amount || !month || !year || !date || !category) {
+      showAlert('يرجى ملء جميع الحقول المطلوبة', 'error');
+      return;
+    }
+    
+    // التحقق من صيغة التاريخ
+    if (!isValidDate(date)) {
+      showAlert('صيغة التاريخ غير صحيحة. يرجى استخدام الصيغة: يوم/شهر/سنة', 'error');
+      return;
+    }
+    
+    // إنشاء معرف فريد للخصم
+    const newId = myDiscounts.length > 0 ? Math.max(...myDiscounts.map(d => d.id)) + 1 : 1;
+    
+    // إضافة الخصم الجديد
+    const newDiscount = {
+      id: newId,
+      month: month,
+      year: year,
+      type: type,
+      amount: amount,
+      status: status,
+      date: date,
+      category: category,
+      notes: notes,
+      createdAt: new Date().toISOString()
+    };
+    
+    myDiscounts.push(newDiscount);
+    saveDiscounts();
+    
+    // إعادة عرض الجدول
+    renderDiscountsTable();
+    updateDiscountStats();
+    
+    // مسح النموذج وإخفاؤه
+    clearDiscountForm();
+    document.getElementById('addDiscountForm').style.display = 'none';
+    
+    showAlert('تم إضافة الخصم بنجاح', 'success');
+  }
+
+  // عرض الجدول
+  function renderDiscountsTable() {
+    const tableBody = document.getElementById('myDiscountsTableBody');
+    const noDiscountsState = document.getElementById('noDiscountsState');
+    const discountsCount = document.getElementById('discountsCount');
+    
+    // تطبيق الفلاتر
+    let filteredDiscounts = filterDiscounts();
+    
+    // التحقق إذا كانت هناك خصومات
+    if (filteredDiscounts.length === 0) {
+      tableBody.innerHTML = '';
+      noDiscountsState.style.display = 'block';
+      discountsCount.textContent = '0 خصم';
+      document.getElementById('discountsTotal').textContent = '0 IQD';
+      renderPagination(0);
+      return;
+    }
+    
+    noDiscountsState.style.display = 'none';
+    
+    // حساب الترقيم
+    const totalPages = Math.ceil(filteredDiscounts.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentDiscounts = filteredDiscounts.slice(startIndex, endIndex);
+    
+    // تحديث العداد
+    discountsCount.textContent = `${filteredDiscounts.length} خصم`;
+    
+    // إنشاء صفوف الجدول
+    let tableHTML = '';
+    let totalAmount = 0;
+    
+    currentDiscounts.forEach(discount => {
+      totalAmount += discount.amount;
+      
+      // تحديد لون الحالة
+      let statusClass = '';
+      if (discount.status === 'مفعل') statusClass = 'status-active';
+      else if (discount.status === 'ملغى') statusClass = 'status-cancelled';
+      else if (discount.status === 'معلق') statusClass = 'status-pending';
+      
+      tableHTML += `
+        <tr>
+          <td>${discount.month} ${discount.year}</td>
+          <td>${discount.type}</td>
+          <td>${formatNumber(discount.amount)} IQD</td>
+          <td><span class="status-badge ${statusClass}">${discount.status}</span></td>
+          <td>${discount.date}</td>
+          <td><span class="badge bg-secondary">${discount.category}</span></td>
+          <td>${discount.notes || '-'}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn btn-sm btn-outline-primary" onclick="editDiscount(${discount.id})">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" onclick="deleteDiscount(${discount.id})">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+    
+    tableBody.innerHTML = tableHTML;
+    document.getElementById('discountsTotal').textContent = `${formatNumber(totalAmount)} IQD`;
+    
+    // عرض ترقيم الصفحات
+    renderPagination(filteredDiscounts.length);
+  }
+
+  // تطبيق الفلاتر
+  function filterDiscounts() {
+    const searchTerm = document.getElementById('myDiscountsSearch').value.toLowerCase();
+    const yearFilter = document.getElementById('myDiscountsYearFilter').value;
+    const statusFilter = document.getElementById('myDiscountsStatusFilter').value;
+    const categoryFilter = document.getElementById('myDiscountsCategoryFilter').value;
+    
+    return myDiscounts.filter(discount => {
+      // تطبيق البحث
+      const matchesSearch = !searchTerm || 
+        discount.type.toLowerCase().includes(searchTerm) ||
+        discount.month.toLowerCase().includes(searchTerm) ||
+        discount.notes.toLowerCase().includes(searchTerm);
+      
+      // تطبيق فلتر السنة
+      const matchesYear = !yearFilter || discount.year === yearFilter;
+      
+      // تطبيق فلتر الحالة
+      const matchesStatus = !statusFilter || discount.status === statusFilter;
+      
+      // تطبيق فلتر القسم
+      const matchesCategory = !categoryFilter || discount.category === categoryFilter;
+      
+      return matchesSearch && matchesYear && matchesStatus && matchesCategory;
+    });
+  }
+
+  // تحديث علامات الفلاتر
+  function updateFilterTags() {
+    const tagsContainer = document.getElementById('discountFilterTags');
+    const yearFilter = document.getElementById('myDiscountsYearFilter').value;
+    const statusFilter = document.getElementById('myDiscountsStatusFilter').value;
+    const categoryFilter = document.getElementById('myDiscountsCategoryFilter').value;
+    
+    let tagsHTML = '';
+    
+    if (yearFilter) {
+      tagsHTML += `
+        <div class="filter-tag">
+          السنة: ${yearFilter}
+          <button class="remove-tag" onclick="clearFilter('year')">
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+      `;
+    }
+    
+    if (statusFilter) {
+      tagsHTML += `
+        <div class="filter-tag">
+          الحالة: ${statusFilter}
+          <button class="remove-tag" onclick="clearFilter('status')">
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+      `;
+    }
+    
+    if (categoryFilter) {
+      tagsHTML += `
+        <div class="filter-tag">
+          القسم: ${categoryFilter}
+          <button class="remove-tag" onclick="clearFilter('category')">
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+      `;
+    }
+    
+    tagsContainer.innerHTML = tagsHTML;
+  }
+
+  // مسح الفلتر
+  function clearFilter(filterType) {
+    if (filterType === 'year') {
+      document.getElementById('myDiscountsYearFilter').value = '';
+    } else if (filterType === 'status') {
+      document.getElementById('myDiscountsStatusFilter').value = '';
+    } else if (filterType === 'category') {
+      document.getElementById('myDiscountsCategoryFilter').value = '';
+    }
+    
+    currentPage = 1;
+    renderDiscountsTable();
+    updateFilterTags();
+  }
+
+  // مسح البحث
+  function clearDiscountSearch() {
+    document.getElementById('myDiscountsSearch').value = '';
+    currentPage = 1;
+    renderDiscountsTable();
+    updateFilterTags();
+    document.getElementById('clearDiscountSearch').style.display = 'none';
+  }
+
+  // ترقيم الصفحات
+  function renderPagination(totalItems) {
+    const paginationContainer = document.getElementById('myDiscountsPagination');
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    
+    if (totalPages <= 1) {
+      paginationContainer.innerHTML = '';
+      return;
+    }
+    
+    let paginationHTML = `
+      <nav aria-label="تصفح الخصومات">
+        <ul class="pagination justify-content-center">
+    `;
+    
+    // زر السابق
+    paginationHTML += `
+      <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+        <button class="page-link" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </li>
+    `;
+    
+    // أرقام الصفحات
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+        paginationHTML += `
+          <li class="page-item ${i === currentPage ? 'active' : ''}">
+            <button class="page-link" onclick="changePage(${i})">${i}</button>
+          </li>
+        `;
+      } else if (i === currentPage - 2 || i === currentPage + 2) {
+        paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+      }
+    }
+    
+    // زر التالي
+    paginationHTML += `
+      <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+        <button class="page-link" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+      </li>
+    `;
+    
+    paginationHTML += `
+        </ul>
+      </nav>
+      <div class="text-center mt-2">
+        <small class="text-muted">الصفحة ${currentPage} من ${totalPages}</small>
+      </div>
+    `;
+    
+    paginationContainer.innerHTML = paginationHTML;
+  }
+
+  // تغيير الصفحة
+  function changePage(page) {
+    if (page < 1) return;
+    
+    const totalItems = filterDiscounts().length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    
+    if (page > totalPages) return;
+    
+    currentPage = page;
+    renderDiscountsTable();
+  }
+
+  // تحديث الإحصائيات
+  function updateDiscountStats() {
+    if (myDiscounts.length === 0) {
+      document.getElementById('myTotalDiscounts').textContent = '0 IQD';
+      document.getElementById('myMonthlyAverage').textContent = '0 IQD';
+      document.getElementById('myLastMonthDiscount').textContent = '0 IQD';
+      document.getElementById('activeDiscountsCount').textContent = '0';
+      return;
+    }
+    
+    // إجمالي الخصومات
+    const totalDiscounts = myDiscounts.reduce((sum, discount) => {
+      return discount.status === 'مفعل' ? sum + discount.amount : sum;
+    }, 0);
+    
+    document.getElementById('myTotalDiscounts').textContent = `${formatNumber(totalDiscounts)} IQD`;
+    
+    // المعدل الشهري
+    const activeDiscounts = myDiscounts.filter(d => d.status === 'مفعل');
+    const monthlyAverage = activeDiscounts.length > 0 ? totalDiscounts / activeDiscounts.length : 0;
+    document.getElementById('myMonthlyAverage').textContent = `${formatNumber(monthlyAverage)} IQD`;
+    
+    // آخر شهر
+    const currentMonth = new Date().getMonth() + 1;
+    const monthNames = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+    const currentMonthName = monthNames[currentMonth - 1];
+    const currentYear = new Date().getFullYear().toString();
+    
+    const lastMonthDiscounts = myDiscounts.filter(d => 
+      d.month === currentMonthName && d.year === currentYear && d.status === 'مفعل'
+    );
+    
+    const lastMonthTotal = lastMonthDiscounts.reduce((sum, discount) => sum + discount.amount, 0);
+    document.getElementById('myLastMonthDiscount').textContent = `${formatNumber(lastMonthTotal)} IQD`;
+    
+    // عدد الخصومات المفعلة
+    document.getElementById('activeDiscountsCount').textContent = activeDiscounts.length;
+    
+    // تحديث الاتجاهات
+    updateTrends();
+  }
+
+  // تحديث الاتجاهات
+  function updateTrends() {
+    // هذه دالة تجريبية، في التطبيق الحقيقي ستقارن مع البيانات السابقة
+    document.getElementById('totalDiscountsTrend').innerHTML = '<i class="bi bi-arrow-up"></i> 12%';
+    document.getElementById('monthlyAverageTrend').innerHTML = '<i class="bi bi-arrow-down"></i> 5%';
+    document.getElementById('lastMonthTrend').innerHTML = '<i class="bi bi-arrow-up"></i> 8%';
+  }
+
+  // تحرير خصم
+  function editDiscount(id) {
+    const discount = myDiscounts.find(d => d.id === id);
+    if (!discount) return;
+    
+    // تعبئة النموذج بقيم الخصم
+    document.getElementById('newDiscountType').value = discount.type;
+    document.getElementById('newDiscountAmount').value = discount.amount;
+    document.getElementById('newDiscountMonth').value = discount.month;
+    document.getElementById('newDiscountYear').value = discount.year;
+    document.getElementById('newDiscountDate').value = discount.date;
+    document.getElementById('newDiscountStatus').value = discount.status;
+    document.getElementById('newDiscountCategory').value = discount.category;
+    document.getElementById('newDiscountNotes').value = discount.notes;
+    
+    // إظهار النموذج
+    document.getElementById('addDiscountForm').style.display = 'block';
+    
+    // تغيير زر الحفظ لتحديث الخصم
+    const saveButton = document.querySelector('#addDiscountForm .btn-primary');
+    saveButton.innerHTML = '<i class="bi bi-check-circle"></i> تحديث الخصم';
+    saveButton.onclick = function() { updateDiscount(id); };
+    
+    // إضافة زر إلغاء التحديث
+    if (!document.getElementById('cancelUpdateBtn')) {
+      const cancelButton = document.createElement('button');
+      cancelButton.className = 'btn btn-outline-warning';
+      cancelButton.innerHTML = '<i class="bi bi-x-circle"></i> إلغاء التحديث';
+      cancelButton.id = 'cancelUpdateBtn';
+      cancelButton.onclick = function() {
+        clearDiscountForm();
+        saveButton.innerHTML = '<i class="bi bi-check-circle"></i> حفظ الخصم';
+        saveButton.onclick = function() { addNewDiscount(); };
+        cancelButton.remove();
+      };
+      
+      document.querySelector('.form-actions').appendChild(cancelButton);
+    }
+    
+    showAlert('يمكنك الآن تعديل الخصم', 'info');
+  }
+
+  // تحديث خصم
+  function updateDiscount(id) {
+    const discountIndex = myDiscounts.findIndex(d => d.id === id);
+    if (discountIndex === -1) return;
+    
+    const type = document.getElementById('newDiscountType').value;
+    const amount = parseFloat(document.getElementById('newDiscountAmount').value);
+    const month = document.getElementById('newDiscountMonth').value;
+    const year = document.getElementById('newDiscountYear').value;
+    const date = document.getElementById('newDiscountDate').value;
+    const status = document.getElementById('newDiscountStatus').value;
+    const category = document.getElementById('newDiscountCategory').value;
+    const notes = document.getElementById('newDiscountNotes').value;
+    
+    // التحقق من الحقول المطلوبة
+    if (!type || !amount || !month || !year || !date || !category) {
+      showAlert('يرجى ملء جميع الحقول المطلوبة', 'error');
+      return;
+    }
+    
+    // التحقق من صيغة التاريخ
+    if (!isValidDate(date)) {
+      showAlert('صيغة التاريخ غير صحيحة. يرجى استخدام الصيغة: يوم/شهر/سنة', 'error');
+      return;
+    }
+    
+    // تحديث الخصم
+    myDiscounts[discountIndex] = {
+      ...myDiscounts[discountIndex],
+      type,
+      amount,
+      month,
+      year,
+      date,
+      status,
+      category,
+      notes,
+      updatedAt: new Date().toISOString()
+    };
+    
+    saveDiscounts();
+    
+    // إعادة العرض
+    renderDiscountsTable();
+    updateDiscountStats();
+    
+    // إعادة تعيين النموذج
+    clearDiscountForm();
+    document.getElementById('addDiscountForm').style.display = 'none';
+    
+    // إعادة تعيين زر الحفظ
+    const saveButton = document.querySelector('#addDiscountForm .btn-primary');
+    saveButton.innerHTML = '<i class="bi bi-check-circle"></i> حفظ الخصم';
+    saveButton.onclick = function() { addNewDiscount(); };
+    
+    // إزالة زر إلغاء التحديث
+    const cancelButton = document.getElementById('cancelUpdateBtn');
+    if (cancelButton) cancelButton.remove();
+    
+    showAlert('تم تحديث الخصم بنجاح', 'success');
+  }
+
+  // حذف خصم
+  function deleteDiscount(id) {
+    if (!confirm('هل أنت متأكد من حذف هذا الخصم؟ لا يمكن التراجع عن هذا الإجراء.')) {
+      return;
+    }
+    
+    const discountIndex = myDiscounts.findIndex(d => d.id === id);
+    if (discountIndex === -1) return;
+    
+    myDiscounts.splice(discountIndex, 1);
+    saveDiscounts();
+    
+    renderDiscountsTable();
+    updateDiscountStats();
+    
+    showAlert('تم حذف الخصم بنجاح', 'success');
+  }
+
+  // عرض نافذة إضافة نوع جديد
+  function showAddTypeModal() {
+    const modal = new bootstrap.Modal(document.getElementById('addTypeModal'));
+    modal.show();
+  }
+
+  // حفظ نوع جديد
+  function saveNewType() {
+    const typeName = document.getElementById('newTypeName').value.trim();
+    const typeDescription = document.getElementById('newTypeDescription').value.trim();
+    const typeCategory = document.getElementById('newTypeCategory').value;
+    
+    if (!typeName) {
+      showAlert('يرجى إدخال اسم النوع', 'error');
+      return;
+    }
+    
+    // التحقق إذا كان النوع موجود مسبقًا
+    if (discountTypes.includes(typeName)) {
+      showAlert('هذا النوع موجود مسبقًا', 'error');
+      return;
+    }
+    
+    // إضافة النوع الجديد
+    discountTypes.push(typeName);
+    saveTypes();
+    
+    // تحديث القائمة المنسدلة
+    updateTypeSelect();
+    
+    // تعيين النوع الجديد كقيمة مختارة
+    document.getElementById('newDiscountType').value = typeName;
+    
+    // إغلاق النافذة
+    bootstrap.Modal.getInstance(document.getElementById('addTypeModal')).hide();
+    
+    // مسح الحقول
+    document.getElementById('newTypeName').value = '';
+    document.getElementById('newTypeDescription').value = '';
+    
+    showAlert('تم إضافة النوع الجديد بنجاح', 'success');
+  }
+
+  // تحديث قائمة الأنواع
+  function updateTypeSelect() {
+    const typeSelect = document.getElementById('newDiscountType');
+    const filterTypeSelect = document.getElementById('myDiscountsTypeFilter');
+    
+    // حفظ القيمة المختارة حالياً
+    const currentValue = typeSelect.value;
+    
+    // تحديث الخيارات
+    let typeOptions = '<option value="">اختر نوع الخصم</option>';
+    discountTypes.forEach(type => {
+      typeOptions += `<option value="${type}">${type}</option>`;
+    });
+    
+    typeSelect.innerHTML = typeOptions;
+    
+    // استعادة القيمة المختارة
+    if (currentValue && discountTypes.includes(currentValue)) {
+      typeSelect.value = currentValue;
+    }
+    
+    // تحديث فلتر الأنواع إذا كان موجوداً
+    if (filterTypeSelect) {
+      filterTypeSelect.innerHTML = typeOptions.replace('اختر نوع الخصم', 'جميع الأنواع');
+    }
+  }
+
+  // عرض نافذة إضافة قسم جديد
+  function showAddCategoryModal() {
+    const modal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
+    modal.show();
+  }
+
+  // اختيار لون القسم
+  function selectCategoryColor(color) {
+    document.getElementById('selectedCategoryColor').value = color;
+    
+    // إزالة التحديد من جميع الأزرار
+    document.querySelectorAll('.color-option').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    
+    // إضافة التحديد للزر المختار
+    event.target.classList.add('active');
+  }
+
+  // حفظ قسم جديد
+  function saveNewCategory() {
+    const categoryName = document.getElementById('newCategoryName').value.trim();
+    const categoryDescription = document.getElementById('newCategoryDescription').value.trim();
+    const categoryColor = document.getElementById('selectedCategoryColor').value;
+    
+    if (!categoryName) {
+      showAlert('يرجى إدخال اسم القسم', 'error');
+      return;
+    }
+    
+    // التحقق إذا كان القسم موجود مسبقًا
+    if (discountCategories.includes(categoryName)) {
+      showAlert('هذا القسم موجود مسبقًا', 'error');
+      return;
+    }
+    
+    // إضافة القسم الجديد
+    discountCategories.push(categoryName);
+    saveCategories();
+    
+    // تحديث القائمة المنسدلة
+    updateCategorySelect();
+    
+    // تعيين القسم الجديد كقيمة مختارة
+    document.getElementById('newDiscountCategory').value = categoryName;
+    
+    // إغلاق النافذة
+    bootstrap.Modal.getInstance(document.getElementById('addCategoryModal')).hide();
+    
+    // مسح الحقول
+    document.getElementById('newCategoryName').value = '';
+    document.getElementById('newCategoryDescription').value = '';
+    
+    showAlert('تم إضافة القسم الجديد بنجاح', 'success');
+  }
+
+  // تحديث قائمة الأقسام
+  function updateCategorySelect() {
+    const categorySelect = document.getElementById('newDiscountCategory');
+    const filterCategorySelect = document.getElementById('myDiscountsCategoryFilter');
+    
+    // حفظ القيمة المختارة حالياً
+    const currentValue = categorySelect.value;
+    
+    // تحديث الخيارات
+    let categoryOptions = '<option value="">اختر القسم</option>';
+    discountCategories.forEach(category => {
+      categoryOptions += `<option value="${category}">${category}</option>`;
+    });
+    
+    categorySelect.innerHTML = categoryOptions;
+    
+    // استعادة القيمة المختارة
+    if (currentValue && discountCategories.includes(currentValue)) {
+      categorySelect.value = currentValue;
+    }
+    
+    // تحديث فلتر الأقسام إذا كان موجوداً
+    if (filterCategorySelect) {
+      filterCategorySelect.innerHTML = categoryOptions.replace('اختر القسم', 'جميع الأقسام');
+    }
+  }
+
+  // عرض منتقي التاريخ
+  function showDatePicker() {
+    const modal = new bootstrap.Modal(document.getElementById('datePickerModal'));
+    updateCalendar();
+    modal.show();
+  }
+
+  // تهيئة منتقي التاريخ
+  function initializeDatePicker() {
+    updateCalendar();
+  }
+
+  // تحديث التقويم
+  function updateCalendar() {
+    const monthYearElement = document.getElementById('currentMonthYear');
+    const daysElement = document.getElementById('calendarDays');
+    
+    const monthNames = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+    
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+    
+    monthYearElement.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+    
+    // الحصول على أول يوم من الشهر
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const lastDay = new Date(currentYear, currentMonth + 1, 0);
+    
+    // حساب يوم الأسبوع لأول يوم (0 = الأحد، 1 = الاثنين، ...)
+    let firstDayOfWeek = firstDay.getDay();
+    
+    // في التقويم العربي، الأحد هو اليوم الأول
+    if (firstDayOfWeek === 0) firstDayOfWeek = 7;
+    
+    let daysHTML = '';
+    
+    // أيام الشهر السابق
+    const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+    for (let i = firstDayOfWeek - 1; i > 0; i--) {
+      daysHTML += `<div class="calendar-day other-month">${prevMonthLastDay - i + 1}</div>`;
+    }
+    
+    // أيام الشهر الحالي
+    const today = new Date();
+    const isToday = (day) => {
+      return day === today.getDate() && 
+             currentMonth === today.getMonth() && 
+             currentYear === today.getFullYear();
+    };
+    
+    const isSelected = (day) => {
+      if (!selectedDate) return false;
+      return day === selectedDate.getDate() && 
+             currentMonth === selectedDate.getMonth() && 
+             currentYear === selectedDate.getFullYear();
+    };
+    
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+      let dayClass = 'calendar-day';
+      if (isToday(day)) dayClass += ' today';
+      if (isSelected(day)) dayClass += ' selected';
+      
+      daysHTML += `
+        <div class="${dayClass}" onclick="selectCalendarDay(${day})">
+          ${day}
+        </div>
+      `;
+    }
+    
+    // أيام الشهر التالي
+    const totalCells = 42; // 6 أسطر × 7 أيام
+    const remainingCells = totalCells - (firstDayOfWeek - 1 + lastDay.getDate());
+    
+    for (let day = 1; day <= remainingCells; day++) {
+      daysHTML += `<div class="calendar-day other-month">${day}</div>`;
+    }
+    
+    daysElement.innerHTML = daysHTML;
+  }
+
+  // تغيير الشهر
+  function changeMonth(delta) {
+    currentDate.setMonth(currentDate.getMonth() + delta);
+    updateCalendar();
+  }
+
+  // اختيار يوم من التقويم
+  function selectCalendarDay(day) {
+    selectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    updateCalendar();
+    
+    // تحديث حقل الإدخال اليدوي
+    const formattedDate = `${day}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`;
+    document.getElementById('manualDateInput').value = formattedDate;
+  }
+
+  // تعيين التاريخ يدويًا
+  function setManualDate() {
+    const manualInput = document.getElementById('manualDateInput').value;
+    
+    if (!isValidDate(manualInput)) {
+      showAlert('صيغة التاريخ غير صحيحة. يرجى استخدام الصيغة: يوم/شهر/سنة', 'error');
+      return;
+    }
+    
+    const parts = manualInput.split('/');
+    const day = parseInt(parts[0]);
+    const month = parseInt(parts[1]) - 1;
+    const year = parseInt(parts[2]);
+    
+    selectedDate = new Date(year, month, day);
+    currentDate = new Date(year, month, 1);
+    updateCalendar();
+    
+    showAlert('تم تعيين التاريخ بنجاح', 'success');
+  }
+
+  // تطبيق التاريخ المختار
+  function applySelectedDate() {
+    if (!selectedDate) {
+      showAlert('يرجى اختيار تاريخ أولاً', 'error');
+      return;
+    }
+    
+    const formattedDate = `${selectedDate.getDate()}/${selectedDate.getMonth() + 1}/${selectedDate.getFullYear()}`;
+    document.getElementById('newDiscountDate').value = formattedDate;
+    
+    // تحديث الشهر والسنة في النموذج
+    const monthNames = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+    document.getElementById('newDiscountMonth').value = monthNames[selectedDate.getMonth()];
+    document.getElementById('newDiscountYear').value = selectedDate.getFullYear().toString();
+    
+    // إغلاق النافذة
+    bootstrap.Modal.getInstance(document.getElementById('datePickerModal')).hide();
+  }
+
+  // التحقق من صحة التاريخ
+  function isValidDate(dateString) {
+    const pattern = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+    if (!pattern.test(dateString)) return false;
+    
+    const parts = dateString.split('/');
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10);
+    const year = parseInt(parts[2], 10);
+    
+    if (month < 1 || month > 12) return false;
+    
+    const daysInMonth = new Date(year, month, 0).getDate();
+    if (day < 1 || day > daysInMonth) return false;
+    
+    return true;
+  }
+
+  // التحقق من حقل التاريخ يدويًا
+  function validateDateInput(input) {
+    const value = input.value.trim();
+    
+    if (value && !isValidDate(value)) {
+      input.classList.add('is-invalid');
+      showAlert('صيغة التاريخ غير صحيحة. يرجى استخدام الصيغة: يوم/شهر/سنة', 'error');
+    } else {
+      input.classList.remove('is-invalid');
+    }
+  }
+
+  // عرض منبثق لاختيار الشهر
+  function showMonthPicker() {
+    // هذه دالة مبسطة، يمكن تطويرها لتعرض نافذة منبثقة خاصة
+    alert('يمكنك اختيار الشهر من القائمة المنسدلة أو كتابته يدوياً في حقل التاريخ');
+  }
+
+  // تصدير الخصومات
+  function exportDiscounts() {
+    const filteredDiscounts = filterDiscounts();
+    
+    if (filteredDiscounts.length === 0) {
+      showAlert('لا توجد بيانات للتصدير', 'warning');
+      return;
+    }
+    
+    // إنشاء CSV
+    let csv = 'الشهر,السنة,نوع الخصم,المبلغ,الحالة,التاريخ,القسم,ملاحظات\n';
+    
+    filteredDiscounts.forEach(discount => {
+      csv += `"${discount.month}","${discount.year}","${discount.type}","${discount.amount}","${discount.status}","${discount.date}","${discount.category}","${discount.notes || ''}"\n`;
+    });
+    
+    // إنشاء ملف وتنزيله
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `خصومات_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showAlert('تم تصدير البيانات بنجاح', 'success');
+  }
+
+  // تنسيق الأرقام
+  function formatNumber(num) {
+    return num.toLocaleString('ar-EG');
+  }
+
+  // عرض تنبيه
+  function showAlert(message, type = 'info') {
+    // إنشاء عنصر التنبيه
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
+    alertDiv.style.position = 'fixed';
+    alertDiv.style.top = '20px';
+    alertDiv.style.right = '20px';
+    alertDiv.style.zIndex = '9999';
+    alertDiv.style.minWidth = '300px';
+    
+    alertDiv.innerHTML = `
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    // إضافة التنبيه إلى الصفحة
+    document.body.appendChild(alertDiv);
+    
+    // إخفاء التنبيه بعد 5 ثوان
+    setTimeout(() => {
+      if (alertDiv.parentNode) {
+        alertDiv.classList.remove('show');
+        setTimeout(() => {
+          if (alertDiv.parentNode) {
+            document.body.removeChild(alertDiv);
+          }
+        }, 300);
+      }
+    }, 5000);
+  }
+</script>

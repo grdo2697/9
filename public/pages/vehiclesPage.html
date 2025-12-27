@@ -1,0 +1,77 @@
+<div class="page-container" id="vehiclesPage">
+<!-- Hero Section -->
+<section class="page-hero">
+<div class="container">
+<div class="row">
+<div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+<h1>إدارة المركبات</h1>
+<p class="lead">تسيير ومتابعة مركبات الشركة المخصصة للموظفين</p>
+</div>
+</div>
+</div>
+</section>
+<section class="page-content">
+<div class="container">
+<!-- Search and Filter Section -->
+<div class="search-filter-container" data-aos="fade-up">
+<div class="row">
+<div class="col-md-6">
+<div class="search-box">
+<input class="form-control" id="vehiclesSearch" placeholder="ابحث باسم الموظف أو رقم اللوحة..." type="text"/>
+<i class="bi bi-search"></i>
+</div>
+</div>
+<div class="col-md-3">
+<select class="form-control" id="vehiclesTypeFilter">
+<option value="">جميع الأنواع</option>
+<option value="سيدان">سيدان</option>
+<option value="كروس أوفر">كروس أوفر</option>
+<option value="دفع رباعي">دفع رباعي</option>
+<option value="بيك أب">بيك أب</option>
+<option value="شاحنة">شاحنة</option>
+</select>
+</div>
+<div class="col-md-3">
+<select class="form-control" id="vehiclesStatusFilter">
+<option value="">جميع الحالات</option>
+<option value="جديدة">جديدة</option>
+<option value="مستعملة">مستعملة</option>
+<option value="صيانة">صيانة</option>
+<option value="غير متاحة">غير متاحة</option>
+</select>
+</div>
+</div>
+</div>
+<div class="service-card" data-aos="fade-up">
+<div class="d-flex justify-content-between align-items-center mb-4">
+<h3 class="mb-0">سجل المركبات</h3>
+<button class="btn btn-primary" onclick="showAddVehicleModal()">
+<i class="bi bi-plus-circle"></i> إضافة مركبة جديدة
+                            </button>
+</div>
+<div class="table-responsive">
+<table class="data-table">
+<thead>
+<tr>
+<th>رقم اللوحة</th>
+<th>نوع المركبة</th>
+<th>الموديل</th>
+<th>اسم الموظف</th>
+<th>تاريخ التسليم</th>
+<th>الحالة</th>
+<th>الإجراءات</th>
+</tr>
+</thead>
+<tbody id="vehiclesTableBody">
+<!-- Will be populated by JS -->
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="pagination-container" id="vehiclesPagination">
+<!-- Pagination will be added by JavaScript -->
+</div>
+</div>
+</div>
+</section>
+</div>

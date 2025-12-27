@@ -1,0 +1,2417 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>شركة العصر الذكي - نظام إدارة الموظفين المتكامل</title>
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- Google Identity Services (Sign in with Google) -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+  <div id="appAlerts" aria-live="polite" aria-atomic="true"></div>
+    <!-- Login Page (Modern Design) -->
+    <div class="login-wrapper" id="loginPage">
+        <div class="login-box">
+            <!-- Brand Side -->
+            <div class="login-brand">
+                <img src="assets/img/logo.png" alt="Logo" onerror="this.style.display='none'">
+                <h1>شركة العصر الذكي</h1>
+                <p>نظام إدارة الموظفين والخدمات</p>
+                <div class="login-brand-badges">
+                    <span class="badge">توظيف</span>
+                    <span class="badge">موظفين</span>
+                    <span class="badge">إدارة</span>
+                </div>
+            </div>
+
+            <!-- Form Side -->
+            <div class="login-form">
+                <h2>تسجيل الدخول</h2>
+                <p class="login-subtitle">سجّل بحسابك (Google) أو استخدم الإيميل/الباسورد إذا كان عندك صلاحيات</p>
+
+                <!-- Google Sign-In (Public Registration) -->
+                <div id="googleSignInBox" class="google-box"></div>
+                <div class="divider"><span>أو</span></div>
+
+                <!-- Email/Password (Admin-created users) -->
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label" for="loginEmail">البريد الإلكتروني</label>
+                        <input type="email" id="loginEmail" class="form-control" placeholder="example@email.com" required>
+                    </div>
+
+                    <div class="form-group password-group">
+                        <label class="form-label" for="loginPassword">كلمة المرور</label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="********" required>
+                        <button class="password-toggle" type="button" onclick="togglePassword()" aria-label="toggle password">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            <span>تذكرني</span>
+                        </label>
+                        <span class="login-hint">Google: زائر فقط</span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 btn-login">دخول</button>
+
+                    <small class="login-note">
+                        الدخول عبر Google يعطيك صلاحيات <b>زائر</b> ويظهر فقط (عن الشركة + التقديم على وظيفة).
+                    </small>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" style="display: none;">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+            <div class="container">
+                <a class="navbar-brand" href="#" onclick="showPage('home')">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2173/2173475.png" class="logo-image" alt="شركة العصر الذكي">
+                    <div class="d-flex flex-column">
+                        <strong class="logo-text">العصر الذكي</strong>
+                        <small class="logo-slogan">نظام إدارة الموظفين المتكامل</small>
+                    </div>
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" onclick="showPage('home')">الصفحة الرئيسية</a>
+                        </li>
+
+                        <!-- Public / Guest -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                عام
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="showPage('instructions')">تعليمات الشركة</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="showPage('aiChat')">محادثة AI</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li class="guest-only"><a class="dropdown-item" href="#" onclick="showPage('about')">عن الشركة</a></li>
+                                <li class="guest-only"><a class="dropdown-item" href="#" onclick="showPage('jobs')">الوظائف</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- My Services -->
+                        <li class="nav-item dropdown user-only">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                خدماتي
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="showPage('myInfo')">معلوماتي</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="showPage('myDiscounts')">خصوماتي</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="showPage('myContract')">عقدي</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="showPage('myVehicle')">مركبتي</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="showPage('myRatings')">تقييمي</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="showPage('messages')">المراسلات</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Management -->
+                        <li class="nav-item dropdown user-only manager-only hr-only admin-only">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                الإدارة
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="showPage('employees')">الموظفين</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="showPage('discounts')">الخصومات</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="showPage('contracts')">العقود</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="showPage('vehicles')">المركبات</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="showPage('ratings')">التقييمات</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Admin -->
+                        <li class="nav-item dropdown user-only admin-only">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                المدير
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="showPage('dashboard')">لوحة التحكم</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="showPage('advancedDashboard')">داشبورد متقدم</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" onclick="showPage('users')">إدارة المستخدمين</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="showPage('permissions')">إدارة الصلاحيات</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="showPage('reports')">التقارير</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    
+                    <ul class="navbar-nav">
+                        <!-- Messages icon (WhatsApp-like inbox) -->
+                        <li class="nav-item user-only">
+                            <a class="nav-link nav-icon-btn" href="#" onclick="showPage('messages')" aria-label="المراسلات">
+                                <i class="bi bi-chat-left-text"></i>
+                                <span class="nav-badge" id="navMsgBadge" style="display:none;">0</span>
+                            </a>
+                        </li>
+                        <!-- Theme Toggle -->
+                        <li class="nav-item">
+                            <button class="nav-link btn btn-link theme-toggle" type="button" onclick="toggleTheme()" aria-label="تبديل الوضع الليلي">
+                                <i class="bi bi-moon-stars" id="themeIcon"></i>
+                            </button>
+                        </li>
+                        <!-- Logout (visible) -->
+                        <li class="nav-item user-only">
+                            <a class="nav-link" href="#" onclick="logout()">
+                                <i class="bi bi-box-arrow-left"></i> تسجيل الخروج
+                            </a>
+                        </li>
+                        <li class="nav-item guest-only">
+                            <a class="nav-link" href="#" onclick="showPage('login')">تسجيل الدخول</a>
+                        </li>
+                        
+                        <li class="nav-item user-only user-dropdown">
+                            <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()">
+                                <!-- Initials will be set by JS -->
+                            </div>
+                            <div class="user-menu" id="userMenu">
+                                <a href="#" class="user-menu-item" onclick="showPage('profile')">
+                                    <i class="bi bi-person"></i> الملف الشخصي
+                                </a>
+                                <a href="#" class="user-menu-item admin-only" onclick="showPage('settings')">
+                                    <i class="bi bi-gear"></i> الإعدادات
+                                </a>
+                                <div class="user-menu-item" onclick="logout()">
+                                    <i class="bi bi-box-arrow-left"></i> تسجيل الخروج
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- (Removed) Admin in-page editor panel as requested -->
+
+        <!-- AI Chat quick access -->
+        <button class="ai-chat-fab" type="button" onclick="showPage('aiChat')" aria-label="محادثة AI">
+            <i class="bi bi-chat-dots"></i>
+        </button>
+
+        <!-- Toast / notifications (top) -->
+        <div id="toastRoot" class="toast-root" aria-live="polite" aria-atomic="true"></div>
+
+        <!-- Home Page -->
+        <div class="page-container active" id="homePage">
+            <!-- Hero Section -->
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1 class="editable" data-id="homeTitle" data-permission="all">نظام إدارة الموظفين المتكامل</h1>
+                            <p class="lead editable" data-id="homeSubtitle" data-permission="all">مرحباً بك في نظام إدارة الموظفين الذكي</p>
+                            <div class="guest-only mt-4">
+                                <p>للتقديم على الوظائف المتاحة، الرجاء زيارة صفحة الوظائف</p>
+                                <a href="#" class="btn btn-light btn-lg" onclick="showPage('jobs')">التقديم على الوظائف</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Services Preview -->
+            <section class="page-content">
+                <div class="container">
+                    <div class="section-title" data-aos="fade-up">
+                        <h2 class="editable" data-id="servicesPreviewTitle" data-permission="all">الواجهات المتاحة</h2>
+                        <p class="editable guest-only" data-id="servicesPreviewDesc" data-permission="all">اختر من القوائم أعلاه ما يتناسب مع صلاحياتك</p>
+                        <p class="editable user-only" data-id="servicesPreviewDescUser" data-permission="all">مرحباً بك في نظام إدارة الموظفين المتكامل</p>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                            <div class="service-card" data-permission="all">
+                                <div class="service-icon">
+                                    <i class="bi bi-person-badge"></i>
+                                </div>
+                                <h3 class="editable guest-only" data-id="service1Title">عن الشركة</h3>
+                                <h3 class="editable user-only" data-id="service1TitleUser">البيانات الشخصية</h3>
+                                <p class="editable guest-only" data-id="service1Desc">تعرف على شركة العصر الذكي ورسالتنا ورؤيتنا.</p>
+                                <p class="editable user-only" data-id="service1DescUser">عرض وتعديل المعلومات الشخصية والوظيفية الخاصة بك.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                            <div class="service-card" data-permission="all">
+                                <div class="service-icon">
+                                    <i class="bi bi-percent"></i>
+                                </div>
+                                <h3 class="editable guest-only" data-id="service2Title">الوظائف</h3>
+                                <h3 class="editable user-only" data-id="service2TitleUser">الخصومات</h3>
+                                <p class="editable guest-only" data-id="service2Desc">تصفح الوظائف المتاحة والتقديم للانضمام لفريقنا.</p>
+                                <p class="editable user-only" data-id="service2DescUser">متابعة الخصومات الشهرية والسنوية المطبقة على راتبك.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                            <div class="service-card" data-permission="all">
+                                <div class="service-icon">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                </div>
+                                <h3 class="editable guest-only" data-id="service3Title">تواصل معنا</h3>
+                                <h3 class="editable user-only" data-id="service3TitleUser">العقود</h3>
+                                <p class="editable guest-only" data-id="service3Desc">تواصل معنا للاستفسارات والمقابلات الشخصية.</p>
+                                <p class="editable user-only" data-id="service3DescUser">عرض عقد العمل الخاص بك وتفاصيله.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- About Company Page (For Guests) -->
+        <div class="page-container" id="aboutPage">
+            <!-- Hero Section -->
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>عن شركة العصر الذكي</h1>
+                            <p class="lead">شركة رائدة في مجال التقنية وحلول إدارة الموارد البشرية</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <div class="about-section" data-aos="fade-up">
+                        <h2>من نحن</h2>
+                        <p class="lead">شركة العصر الذكي هي شركة رائدة في مجال تطوير حلول إدارة الموارد البشرية وتقنية المعلومات. تأسست في عام 2010 بهدف تقديم حلول متكاملة للشركات والمؤسسات لتحسين كفاءة عملياتها وإدارة مواردها البشرية بشكل فعال.</p>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <h3>رؤيتنا</h3>
+                                <p>أن نكون الشركة الرائدة في تقديم حلول إدارة الموارد البشرية الذكية في المنطقة، وأن نساهم في تحول الشركات إلى مؤسسات ذكية قادرة على المنافسة في العصر الرقمي.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h3>رسالتنا</h3>
+                                <p>تقديم حلول تقنية مبتكرة تساهم في تحسين كفاءة إدارة الموارد البشرية، وتسهل عمليات التوظيف والتقييم والمتابعة، وتساعد المؤسسات على اتخاذ قرارات استراتيجية مدعومة بالبيانات.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="about-section" data-aos="fade-up" data-aos-delay="100">
+                        <h2>قيمنا</h2>
+                        <div class="row">
+                            <div class="col-md-3 text-center">
+                                <div class="feature-icon">
+                                    <i class="bi bi-lightbulb"></i>
+                                </div>
+                                <h4>الابتكار</h4>
+                                <p>نطور حلولاً مبتكرة تلبي احتياجات العصر الرقمي</p>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <div class="feature-icon">
+                                    <i class="bi bi-shield-check"></i>
+                                </div>
+                                <h4>الجودة</h4>
+                                <p>نلتزم بأعلى معايير الجودة في كل ما نقدمه</p>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <div class="feature-icon">
+                                    <i class="bi bi-people"></i>
+                                </div>
+                                <h4>العمل الجماعي</h4>
+                                <p>نؤمن بأهمية العمل الجماعي لتحقيق النجاح</p>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <div class="feature-icon">
+                                    <i class="bi bi-heart"></i>
+                                </div>
+                                <h4>الرضا</h4>
+                                <p>نسعى لتحقيق رضا عملائنا وموظفينا</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="about-section" data-aos="fade-up" data-aos-delay="200">
+                        <h2>انضم إلى فريقنا</h2>
+                        <p>نبحث دائماً عن المواهب المتميزة للانضمام إلى فريقنا المتنامي. إذا كنت تبحث عن فرصة عمل في بيئة ديناميكية ومبتكرة، نرحب بك للتقديم على الوظائف المتاحة.</p>
+                        <div class="text-center mt-4">
+                            <a href="#" class="btn btn-primary btn-lg" onclick="showPage('jobs')">تصفح الوظائف المتاحة</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Jobs Page (For Guests) -->
+        <div class="page-container" id="jobsPage">
+            <!-- Hero Section -->
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>الوظائف المتاحة</h1>
+                            <p class="lead">انضم إلى فريق عمل شركة العصر الذكي</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <div class="guest-nav" data-aos="fade-up">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-0">مرحباً بك في صفحة الوظائف</h5>
+                                <p class="mb-0 text-muted">يمكنك التقديم على أي وظيفة من الوظائف المتاحة أدناه</p>
+                            </div>
+                            <div>
+                                <a href="#" class="btn btn-outline-light" onclick="showPage('home')">الصفحة الرئيسية</a>
+                                <a href="#" class="btn btn-outline-light" onclick="showPage('about')">عن الشركة</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Job Application Form -->
+                    <div class="service-card" data-aos="fade-up">
+                        <h3>التقديم على الوظائف</h3>
+                        <p>قم بملء النموذج التالي للتقديم على الوظائف المتاحة:</p>
+                        
+                        <form id="jobApplicationForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">الاسم الكامل *</label>
+                                        <input type="text" class="form-control" id="applicantName" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">البريد الإلكتروني *</label>
+                                        <input type="email" class="form-control" id="applicantEmail" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">رقم الهاتف *</label>
+                                        <input type="tel" class="form-control" id="applicantPhone" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">الوظيفة المطلوبة *</label>
+                                        <select class="form-control" id="applicantJob" required>
+                                            <option value="">اختر الوظيفة</option>
+                                            <option value="مهندس برمجيات">مهندس برمجيات</option>
+                                            <option value="مدير مشاريع">مدير مشاريع</option>
+                                            <option value="مصمم جرافيك">مصمم جرافيك</option>
+                                            <option value="محاسب">محاسب</option>
+                                            <option value="مدخل بيانات">مدخل بيانات</option>
+                                            <option value="مدير تسويق">مدير تسويق</option>
+                                            <option value="موظف دعم فني">موظف دعم فني</option>
+                                            <option value="أخرى">أخرى</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">السيرة الذاتية (اختياري)</label>
+                                <input type="file" class="form-control" id="applicantCV" accept=".pdf,.doc,.docx">
+                                <small class="text-muted">يمكنك رفع ملف PDF أو Word بحجم لا يتجاوز 5MB</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">رسالة التقديم *</label>
+                                <textarea class="form-control" id="applicantMessage" rows="4" required placeholder="أخبرنا عن نفسك وخبراتك وأسباب رغبتك في الانضمام إلينا..."></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">ملاحظات إضافية</label>
+                                <textarea class="form-control" id="applicantNotes" rows="2" placeholder="أي معلومات إضافية تريد إضافتها..."></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                                    <label class="form-check-label" for="agreeTerms">
+                                        أوافق على شروط التقديم وخصوصية البيانات
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">تقديم الطلب</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Available Jobs -->
+                    <div class="service-card mt-4" data-aos="fade-up" data-aos-delay="100">
+                        <h3>الوظائف المفتوحة</h3>
+                        <div id="availableJobs">
+                            <!-- Jobs will be loaded by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Company Instructions Page -->
+        <div class="page-container" id="instructionsPage">
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <img src="assets/img/logo.png" class="hero-logo" alt="شعار الشركة"/>
+                            <h1>تعليمات الشركة</h1>
+                            <p class="lead">سياسات وتعليمات العمل داخل الشركة</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-4" data-aos="fade-up">
+                            <div class="service-card">
+                                <div class="d-flex justify-content-between align-items-center mb-3" id="instructionsAdminActions" style="display:none;">
+                                    <button class="btn btn-sm btn-primary" onclick="addInstructionPage()"><i class="bi bi-plus"></i> إضافة صفحة</button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteInstructionPage()"><i class="bi bi-trash"></i> حذف</button>
+                                </div>
+                                <div class="list-group" id="instructionsTabs" data-active=""></div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-8" data-aos="fade-up" data-aos-delay="100">
+                            <div id="instructionsContent"></div>
+
+                            <!-- Admin editor -->
+                            <div class="service-card mt-3" id="instructionsEditorCard" style="display:none;">
+                                <h3 class="mb-3">تعديل الصفحة</h3>
+                                <div class="form-group">
+                                    <label class="form-label">عنوان الصفحة</label>
+                                    <input type="text" class="form-control" id="instructionsEditorTitle" placeholder="عنوان الصفحة">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">المحتوى (HTML بسيط)</label>
+                                    <textarea class="form-control" id="instructionsEditor" rows="10" placeholder="اكتب المحتوى هنا..."></textarea>
+                                </div>
+                                <button class="btn btn-success" id="saveInstructionsBtn" onclick="saveInstructionEdits()"><i class="bi bi-save"></i> حفظ</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- AI Chat Page -->
+        <div class="page-container" id="aiChatPage">
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>محادثة AI</h1>
+                            <p class="lead">مساعد ذكي داخل النظام (يحفظ المحادثة، ويدعم الوضع الليلي)</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <div class="service-card" data-aos="fade-up">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mb-3">
+                            <div>
+                                <h3 class="mb-1">المحادثة</h3>
+                                <p class="mb-0 text-muted">تقدر تسأل عن استخدام النظام، أو تلخيص بيانات، أو نصائح تنظيمية. (واجهة فقط — يمكن ربط API لاحقاً).</p>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-secondary" onclick="clearAiChat()"><i class="bi bi-trash"></i> مسح المحادثة</button>
+                                <button class="btn btn-primary" onclick="openAiChat()"><i class="bi bi-chat-dots"></i> فتح المحادثة</button>
+                            </div>
+                        </div>
+
+                        <div class="ai-chat-embed">
+                            <div class="ai-chat-messages" id="aiChatMessages"></div>
+                            <div class="ai-chat-input">
+                                <input class="form-control" id="aiChatInput" placeholder="اكتب سؤالك هنا..." onkeydown="if(event.key==='Enter'){sendAiChatMessage()}" />
+                                <button class="btn btn-primary" onclick="sendAiChatMessage()"><i class="bi bi-send"></i></button>
+                            </div>
+                            <div class="ai-chat-footer text-muted">
+                                * إذا تحب ربطه بـ API حقيقي، تقدر تضيف Endpoint بالـ Settings (اختياري).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- My Info Page -->
+        <div class="page-container" id="myInfoPage">
+            <!-- Hero Section -->
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>معلوماتي الشخصية</h1>
+                            <p class="lead">عرض وتعديل المعلومات الشخصية والوظيفية</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <div id="myInfoContainer">
+                        <!-- Employee info will be loaded here -->
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Advanced Dashboard Page -->
+        <div class="page-container" id="advancedDashboardPage">
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>داشبورد متقدم</h1>
+                            <p class="lead">سجل النشاطات والإحصائيات المتقدمة</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <div class="stats-cards">
+                        <div class="stat-card" data-aos="fade-up">
+                            <div class="stat-number" id="totalActivities">0</div>
+                            <div class="stat-label">إجمالي النشاطات</div>
+                        </div>
+                        <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+                            <div class="stat-number" id="todayActivities">0</div>
+                            <div class="stat-label">نشاطات اليوم</div>
+                        </div>
+                        <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                            <div class="stat-number" id="userActivities">0</div>
+                            <div class="stat-label">نشاطاتك</div>
+                        </div>
+                        <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+                            <div class="stat-number" id="contentEdits">0</div>
+                            <div class="stat-label">تعديلات المحتوى</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="dashboard-card" data-aos="fade-up">
+                                <h3>سجل النشاطات الأخيرة</h3>
+                                <div id="activityLogList" class="mt-3">
+                                    <!-- Activity log will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="dashboard-card" data-aos="fade-up" data-aos-delay="100">
+                                <h3>إحصائيات النشاطات</h3>
+                                <div class="mt-3">
+                                    <div class="detail-item mb-2">
+                                        <div class="detail-label">إجمالي التعديلات</div>
+                                        <div class="detail-value" id="totalEditsCount">0</div>
+                                    </div>
+                                    <div class="detail-item mb-2">
+                                        <div class="detail-label">إجمالي الحذف</div>
+                                        <div class="detail-value" id="totalDeletesCount">0</div>
+                                    </div>
+                                    <div class="detail-item mb-2">
+                                        <div class="detail-label">إجمالي الإضافات</div>
+                                        <div class="detail-value" id="totalAddsCount">0</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-label">آخر نشاط</div>
+                                        <div class="detail-value" id="lastActivityTime">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="dashboard-card mt-4" data-aos="fade-up" data-aos-delay="200">
+                                <h3>أكثر المستخدمين نشاطاً</h3>
+                                <div id="mostActiveUsers" class="mt-3">
+                                    <!-- Most active users will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card mt-4" data-aos="fade-up" data-aos-delay="300">
+                        <h3>تعديلات المحتوى</h3>
+                        <div class="table-responsive mt-3">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>عنصر المحتوى</th>
+                                        <th>القيمة القديمة</th>
+                                        <th>القيمة الجديدة</th>
+                                        <th>المستخدم</th>
+                                        <th>التاريخ والوقت</th>
+                                        <th>الصفحة</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="contentEditsTable">
+                                    <!-- Content edits will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Employees Page -->
+        <div class="page-container" id="employeesPage">
+            <!-- Hero Section -->
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>إدارة الموظفين</h1>
+                            <p class="lead">السجل الكامل لموظفي الشركة مع جميع المعلومات</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <!-- Search and Filter Section -->
+                    <div class="search-filter-container" data-aos="fade-up">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="search-box">
+                                    <input type="text" class="form-control" id="employeeSearch" placeholder="ابحث عن موظف بالاسم، الوظيفة، أو القسم...">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-control" id="employeeStatusFilter">
+                                    <option value="">جميع الحالات</option>
+                                    <option value="active">نشط</option>
+                                    <option value="inactive">غير نشط</option>
+                                    <option value="vacation">في إجازة</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="filter-options">
+                            <button class="filter-btn active" data-filter="all">الكل</button>
+                            <button class="filter-btn" data-filter="manager">مديرون</button>
+                            <button class="filter-btn" data-filter="regular">موظفون عاديون</button>
+                            <button class="filter-btn" data-filter="supervisor">مشرفون</button>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card" data-aos="fade-up">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="mb-0">قائمة الموظفين</h3>
+                            <button class="btn btn-primary" onclick="showAddEmployeeModal()">
+                                <i class="bi bi-plus-circle"></i> إضافة موظف جديد
+                            </button>
+                        </div>
+                        
+                        <div class="row" id="employeesContainer">
+                            <!-- Employees will be loaded here -->
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="pagination-container" id="employeesPagination">
+                            <!-- Pagination will be added by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- My Discounts Page -->
+        <div class="page-container" id="myDiscountsPage">
+            <!-- Hero Section -->
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>خصوماتي</h1>
+                            <p class="lead">عرض جميع الخصومات المطبقة على راتبي</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <!-- Search and Filter Section -->
+                    <div class="search-filter-container" data-aos="fade-up">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="search-box">
+                                    <input type="text" class="form-control" id="myDiscountsSearch" placeholder="ابحث بنوع الخصم أو الشهر...">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-control" id="myDiscountsYearFilter">
+                                    <option value="">جميع السنوات</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2022">2022</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-control" id="myDiscountsStatusFilter">
+                                    <option value="">جميع الحالات</option>
+                                    <option value="مفعل">مفعل</option>
+                                    <option value="ملغى">ملغى</option>
+                                    <option value="معلق">معلق</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card" data-aos="fade-up">
+                        <h3>الخصومات الشهرية</h3>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>الشهر</th>
+                                        <th>نوع الخصم</th>
+                                        <th>المبلغ</th>
+                                        <th>الحالة</th>
+                                        <th>التاريخ</th>
+                                        <th>ملاحظات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="myDiscountsTableBody">
+                                    <!-- Will be populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="pagination-container" id="myDiscountsPagination">
+                            <!-- Pagination will be added by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="service-card mt-4" data-aos="fade-up" data-aos-delay="100">
+                        <h3>ملخص الخصومات السنوي</h3>
+                        <div class="stats-cards">
+                            <div class="stat-card">
+                                <div class="stat-number" id="myTotalDiscounts">0 <span class="currency">IQD</span></div>
+                                <div class="stat-label">إجمالي الخصومات</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="myMonthlyAverage">0 <span class="currency">IQD</span></div>
+                                <div class="stat-label">المعدل الشهري</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="myLastMonthDiscount">0 <span class="currency">IQD</span></div>
+                                <div class="stat-label">آخر شهر</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Discounts Page -->
+        <div class="page-container" id="discountsPage">
+            <!-- Hero Section -->
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>إدارة الخصومات</h1>
+                            <p class="lead">تسجيل ومتابعة جميع الخصومات الشهرية للموظفين</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <!-- Search and Filter Section -->
+                    <div class="search-filter-container" data-aos="fade-up">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="search-box">
+                                    <input type="text" class="form-control" id="discountsSearch" placeholder="ابحث باسم الموظف أو نوع الخصم...">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="month" class="form-control" id="discountsMonthFilter" placeholder="الشهر">
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-control" id="discountsStatusFilter">
+                                    <option value="">جميع الحالات</option>
+                                    <option value="مفعل">مفعل</option>
+                                    <option value="ملغى">ملغى</option>
+                                    <option value="معلق">معلق</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card" data-aos="fade-up">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="mb-0">سجل الخصومات</h3>
+                            <button class="btn btn-primary" onclick="showAddDiscountModal()">
+                                <i class="bi bi-plus-circle"></i> إضافة خصم جديد
+                            </button>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>رقم الخصم</th>
+                                        <th>اسم الموظف</th>
+                                        <th>نوع الخصم</th>
+                                        <th>المبلغ</th>
+                                        <th>الشهر</th>
+                                        <th>الحالة</th>
+                                        <th>التاريخ</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="discountsTableBody">
+                                    <!-- Will be populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="pagination-container" id="discountsPagination">
+                            <!-- Pagination will be added by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- My Contract Page -->
+        <div class="page-container" id="myContractPage">
+            <!-- Hero Section -->
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>عقدي</h1>
+                            <p class="lead">عرض تفاصيل عقد العمل الخاص بي</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <div class="service-card" data-aos="fade-up" id="myContractContainer">
+                        <!-- Contract details will be loaded here -->
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Contracts Page -->
+        <div class="page-container" id="contractsPage">
+            <!-- Hero Section -->
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>إدارة العقود</h1>
+                            <p class="lead">متابعة عقود العمل وتجديدها وإنهائها</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <!-- Search and Filter Section -->
+                    <div class="search-filter-container" data-aos="fade-up">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="search-box">
+                                    <input type="text" class="form-control" id="contractsSearch" placeholder="ابحث باسم الموظف أو نوع العقد...">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-control" id="contractsTypeFilter">
+                                    <option value="">جميع الأنواع</option>
+                                    <option value="دائم">دائم</option>
+                                    <option value="محدد المدة">محدد المدة</option>
+                                    <option value="مشروع">مشروع</option>
+                                    <option value="تدريب">تدريب</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-control" id="contractsStatusFilter">
+                                    <option value="">جميع الحالات</option>
+                                    <option value="نشط">نشط</option>
+                                    <option value="منتهي">منتهي</option>
+                                    <option value="ملغي">ملغي</option>
+                                    <option value="معلق">معلق</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card" data-aos="fade-up">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="mb-0">قائمة العقود</h3>
+                            <button class="btn btn-primary" onclick="showAddContractModal()">
+                                <i class="bi bi-plus-circle"></i> إضافة عقد جديد
+                            </button>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>رقم العقد</th>
+                                        <th>اسم الموظف</th>
+                                        <th>نوع العقد</th>
+                                        <th>تاريخ البدء</th>
+                                        <th>تاريخ الانتهاء</th>
+                                        <th>الراتب</th>
+                                        <th>الحالة</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="contractsTableBody">
+                                    <!-- Will be populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="pagination-container" id="contractsPagination">
+                            <!-- Pagination will be added by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- My Vehicle Page -->
+        <div class="page-container" id="myVehiclePage">
+            <!-- Hero Section -->
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>مركبتي</h1>
+                            <p class="lead">تفاصيل المركبة المخصصة لي</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <div class="service-card" data-aos="fade-up" id="myVehicleContainer">
+                        <!-- Vehicle details will be loaded here -->
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Vehicles Page -->
+        <div class="page-container" id="vehiclesPage">
+            <!-- Hero Section -->
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>إدارة المركبات</h1>
+                            <p class="lead">تسيير ومتابعة مركبات الشركة المخصصة للموظفين</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <!-- Search and Filter Section -->
+                    <div class="search-filter-container" data-aos="fade-up">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="search-box">
+                                    <input type="text" class="form-control" id="vehiclesSearch" placeholder="ابحث باسم الموظف أو رقم اللوحة...">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-control" id="vehiclesTypeFilter">
+                                    <option value="">جميع الأنواع</option>
+                                    <option value="سيدان">سيدان</option>
+                                    <option value="كروس أوفر">كروس أوفر</option>
+                                    <option value="دفع رباعي">دفع رباعي</option>
+                                    <option value="بيك أب">بيك أب</option>
+                                    <option value="شاحنة">شاحنة</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-control" id="vehiclesStatusFilter">
+                                    <option value="">جميع الحالات</option>
+                                    <option value="جديدة">جديدة</option>
+                                    <option value="مستعملة">مستعملة</option>
+                                    <option value="صيانة">صيانة</option>
+                                    <option value="غير متاحة">غير متاحة</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card" data-aos="fade-up">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="mb-0">سجل المركبات</h3>
+                            <button class="btn btn-primary" onclick="showAddVehicleModal()">
+                                <i class="bi bi-plus-circle"></i> إضافة مركبة جديدة
+                            </button>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>رقم اللوحة</th>
+                                        <th>نوع المركبة</th>
+                                        <th>الموديل</th>
+                                        <th>اسم الموظف</th>
+                                        <th>تاريخ التسليم</th>
+                                        <th>الحالة</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="vehiclesTableBody">
+                                    <!-- Will be populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="pagination-container" id="vehiclesPagination">
+                            <!-- Pagination will be added by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- My Ratings Page -->
+        <div class="page-container" id="myRatingsPage">
+            <!-- Hero Section -->
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>تقييمي</h1>
+                            <p class="lead">عرض تقييمات أدائي الوظيفي</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <!-- Search and Filter Section -->
+                    <div class="search-filter-container" data-aos="fade-up">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="search-box">
+                                    <input type="text" class="form-control" id="myRatingsSearch" placeholder="ابحث بالتعليق أو المقيم...">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="month" class="form-control" id="myRatingsMonthFilter" placeholder="الشهر">
+                            </div>
+                            <div class="col-md-3">
+                                <input class="form-control" id="myRatingsMinFilter" type="number" step="0.1" min="0" max="10" placeholder="أقل تقييم">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="myRatingsContainer">
+                        <!-- Ratings will be loaded here -->
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="pagination-container" id="myRatingsPagination">
+                        <!-- Pagination will be added by JavaScript -->
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Ratings Page -->
+        <div class="page-container" id="ratingsPage">
+            <!-- Hero Section -->
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>تقييمات الموظفين</h1>
+                            <p class="lead">تقييم أداء الموظفين بشكل دوري ومنظم</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <!-- Search and Filter Section -->
+                    <div class="search-filter-container" data-aos="fade-up">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="search-box">
+                                    <input type="text" class="form-control" id="ratingsSearch" placeholder="ابحث باسم الموظف أو المقيم...">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="month" class="form-control" id="ratingsMonthFilter" placeholder="الشهر">
+                            </div>
+                            <div class="col-md-3">
+                                <input class="form-control" id="ratingsMinFilter" type="number" step="0.1" min="0" max="10" placeholder="أقل تقييم (مثال 6.0)">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card" data-aos="fade-up">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="mb-0">سجل التقييمات</h3>
+                            <button class="btn btn-primary" onclick="showAddRatingModal()">
+                                <i class="bi bi-plus-circle"></i> إضافة تقييم جديد
+                            </button>
+                        </div>
+                        
+                        <div id="ratingsContainer">
+                            <!-- Ratings will be loaded here -->
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="pagination-container" id="ratingsPagination">
+                            <!-- Pagination will be added by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Dashboard Page (Admin Only) -->
+        <div class="page-container" id="dashboardPage">
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>لوحة التحكم</h1>
+                            <p class="lead">مرحباً بك في لوحة التحكم، هنا يمكنك إدارة جميع جوانب النظام</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <div class="stats-cards">
+                        <div class="stat-card" data-aos="fade-up">
+                            <div class="stat-number" id="totalUsers">0</div>
+                            <div class="stat-label">إجمالي المستخدمين</div>
+                        </div>
+                        <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+                            <div class="stat-number" id="totalEmployees">0</div>
+                            <div class="stat-label">إجمالي الموظفين</div>
+                        </div>
+                        <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                            <div class="stat-number" id="activeContractsCount">0</div>
+                            <div class="stat-label">العقود النشطة</div>
+                        </div>
+                        <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+                            <div class="stat-number" id="totalVehicles">0</div>
+                            <div class="stat-label">المركبات</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="service-card" data-aos="fade-up">
+                                <h3>إجراءات سريعة</h3>
+                                <div class="d-grid gap-2 mt-3">
+                                    <button class="btn btn-primary" onclick="showPage('employees')">إدارة الموظفين</button>
+                                    <button class="btn btn-success" onclick="showPage('discounts')">إدارة الخصومات</button>
+                                    <button class="btn btn-info" onclick="showPage('contracts')">إدارة العقود</button>
+                                    <button class="btn btn-warning" onclick="showPage('vehicles')">إدارة المركبات</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="service-card" data-aos="fade-up" data-aos-delay="100">
+                                <h3>آخر التحديثات</h3>
+                                <div id="recentUpdates">
+                                    <!-- Will be populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Users Management Page (Admin Only) -->
+        <div class="page-container" id="usersPage">
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>إدارة المستخدمين</h1>
+                            <p class="lead">إدارة حسابات المستخدمين والتحكم في الصلاحيات</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <!-- Search and Filter Section -->
+                    <div class="search-filter-container" data-aos="fade-up">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="search-box">
+                                    <input type="text" class="form-control" id="usersSearch" placeholder="ابحث بالاسم أو البريد الإلكتروني...">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-control" id="usersRoleFilter">
+                                    <option value="">جميع الأدوار</option>
+                                    <option value="admin">مدير النظام</option>
+                                    <option value="manager">مدير قسم</option>
+                                    <option value="hr">موارد بشرية</option>
+                                    <option value="employee">موظف</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-control" id="usersStatusFilter">
+                                    <option value="">جميع الحالات</option>
+                                    <option value="active">نشط</option>
+                                    <option value="inactive">غير نشط</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card" data-aos="fade-up">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="mb-0">قائمة المستخدمين</h3>
+                            <button class="btn btn-primary" onclick="showAddUserModal()">إضافة مستخدم جديد</button>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="users-table">
+                                <thead>
+                                    <tr>
+                                        <th>الاسم</th>
+                                        <th>البريد الإلكتروني</th>
+                                        <th>رقم الهاتف</th>
+                                        <th>نوع الحساب</th>
+                                        <th>الموظف المرتبط</th>
+                                        <th>تاريخ التسجيل</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody">
+                                    <!-- Will be populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="pagination-container" id="usersPagination">
+                            <!-- Pagination will be added by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Permissions Management Page (Admin Only) -->
+        <div class="page-container" id="permissionsPage">
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>إدارة الصلاحيات</h1>
+                            <p class="lead">التحكم الكامل في ما يراه كل نوع من المستخدمين</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <!-- Search and Filter Section -->
+                    <div class="search-filter-container" data-aos="fade-up">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="search-box">
+                                    <input type="text" class="form-control" id="permissionsSearch" placeholder="ابحث باسم الدور أو الوصف...">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-primary w-100" onclick="showAddRoleModal()">إضافة دور جديد</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card" data-aos="fade-up">
+                        <h3>أنواع المستخدمين</h3>
+                        <div class="roles-container" id="rolesContainer">
+                            <!-- Will be populated by JS -->
+                        </div>
+                    </div>
+                    
+                    <div class="service-card mt-4" data-aos="fade-up" data-aos-delay="100">
+                        <h3>إدارة صلاحيات الصفحات</h3>
+                        <div class="permissions-grid" id="pagesPermissions">
+                            <!-- Will be populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Per-user overrides (Admin only) -->
+                    <div class="service-card mt-4" data-aos="fade-up" data-aos-delay="150" id="userPermissionsManagerCard" style="display:none;">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <h3 class="mb-0">صلاحيات المستخدم (تخصيص)</h3>
+                            <div class="d-flex gap-2" id="userPermissionsActions" style="display:none;">
+                                <button class="btn btn-sm btn-outline-primary" onclick="selectAllUserPermissions(true)"><i class="bi bi-check2-square"></i> تحديد الكل</button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="selectAllUserPermissions(false)"><i class="bi bi-square"></i> مسح الكل</button>
+                                <button class="btn btn-sm btn-success" onclick="saveSelectedUserPermissions()"><i class="bi bi-save"></i> حفظ</button>
+                                <button class="btn btn-sm btn-danger" onclick="resetSelectedUserPermissions()"><i class="bi bi-arrow-counterclockwise"></i> إعادة</button>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3 g-2">
+                            <div class="col-md-6">
+                                <label class="form-label">اختر المستخدم</label>
+                                <select class="form-control" id="userPermissionsSelect"></select>
+                                <small class="text-muted">تقدر تخلي المستخدم يشوف صفحة وحدة فقط أو تمنعه من التعديل/الحذف</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">نسخ الصلاحيات من مستخدم آخر</label>
+                                <div class="d-flex gap-2">
+                                    <select class="form-control" id="copyPermissionsFromSelect"></select>
+                                    <button class="btn btn-outline-primary" type="button" onclick="copyPermissionsFromUser()">نسخ</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-light border mt-3" id="userPermissionsHint">
+                            اختر مستخدم حتى تظهر لك جدول الصلاحيات.
+                        </div>
+
+                        <div class="table-responsive mt-2" id="userPermissionsTableWrap" style="display:none;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>الصفحة</th>
+                                        <th class="text-center">عرض</th>
+                                        <th class="text-center">إضافة</th>
+                                        <th class="text-center">تعديل</th>
+                                        <th class="text-center">حذف</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="userPermissionsTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Reports Page -->
+        <div class="page-container" id="reportsPage">
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>التقارير والإحصائيات</h1>
+                            <p class="lead">تقارير شاملة عن جميع جوانب النظام</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <div class="service-card" data-aos="fade-up">
+                        <h3>تقارير الموظفين</h3>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <button class="btn btn-primary w-100 mb-2" onclick="generateEmployeeReport()">
+                                    <i class="bi bi-file-earmark-text"></i> تقرير الموظفين
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-success w-100 mb-2" onclick="generateSalaryReport()">
+                                    <i class="bi bi-cash-stack"></i> تقرير الرواتب
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-info w-100 mb-2" onclick="generateAttendanceReport()">
+                                    <i class="bi bi-calendar-check"></i> تقرير الحضور
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card mt-4" data-aos="fade-up" data-aos-delay="100">
+                        <h3>تقارير مالية</h3>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <button class="btn btn-warning w-100 mb-2" onclick="generateDiscountsReport()">
+                                    <i class="bi bi-percent"></i> تقرير الخصومات
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-danger w-100 mb-2" onclick="generateFinancialReport()">
+                                    <i class="bi bi-graph-up"></i> تقرير مالي شامل
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Profile Page -->
+        <div class="page-container" id="profilePage">
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>الملف الشخصي</h1>
+                            <p class="lead">إدارة معلومات حسابك الشخصي</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="service-card text-center" data-aos="fade-up">
+                                <div class="user-avatar mb-3" id="profileAvatar" style="width: 100px; height: 100px; margin: 0 auto; font-size: 2rem;"></div>
+                                <h3 id="profileName"></h3>
+                                <p id="profileEmail"></p>
+                                <div class="employee-type-badge" id="profileRoleBadge"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-8">
+                            <div class="service-card" data-aos="fade-up" data-aos-delay="100">
+                                <h3>تعديل المعلومات</h3>
+                                <form id="profileForm">
+                                    <div class="form-group">
+                                        <label class="form-label">الاسم الكامل</label>
+                                        <input type="text" id="profileNameInput" class="form-control">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">البريد الإلكتروني</label>
+                                        <input type="email" id="profileEmailInput" class="form-control">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">رقم الهاتف</label>
+                                        <input type="tel" id="profilePhoneInput" class="form-control">
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Settings Page -->
+        <div class="page-container" id="settingsPage">
+            <section class="page-hero">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+                            <h1>إعدادات النظام</h1>
+                            <p class="lead">تخصيص إعدادات النظام الأساسية</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-content">
+                <div class="container">
+                    <div class="service-card" data-aos="fade-up">
+                        <h3>إعدادات عامة</h3>
+                        <form id="settingsForm">
+                            <div class="form-group">
+                                <label class="form-label">اسم الشركة</label>
+                                <input type="text" id="companyName" class="form-control" value="شركة العصر الذكي">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">العملة الافتراضية</label>
+                                <select id="defaultCurrency" class="form-control">
+                                    <option value="IQD" selected>دينار عراقي (IQD)</option>
+                                    <option value="USD">دولار أمريكي (USD)</option>
+                                    <option value="EUR">يورو (EUR)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">اللغة الافتراضية</label>
+                                <select id="defaultLanguage" class="form-control">
+                                    <option value="ar" selected>العربية</option>
+                                    <option value="en">الإنجليزية</option>
+                                </select>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">حفظ الإعدادات</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        
+        <!-- Messages Page (WhatsApp-like UI) -->
+        <div class="page-container" id="messagesPage">
+          <section class="page-content p-0">
+            <div class="container-fluid">
+              <div class="wa-chat" aria-label="المراسلات">
+                <!-- Sidebar -->
+                <aside class="wa-sidebar">
+                  <div class="wa-sidebar-head">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="wa-me" id="waMeAvatar"></div>
+                      <div class="wa-me-meta">
+                        <div class="wa-me-name" id="waMeName">حسابي</div>
+                        <div class="wa-me-sub">المراسلات</div>
+                      </div>
+                    </div>
+                    <div class="wa-head-actions">
+                      <button class="icon-btn" type="button" onclick="startNewThread()" title="محادثة جديدة"><i class="bi bi-chat-dots"></i></button>
+                      <button class="icon-btn" type="button" onclick="clearThread()" title="مسح المحادثة"><i class="bi bi-trash"></i></button>
+                    </div>
+                  </div>
+
+                  <div class="wa-search">
+                    <i class="bi bi-search"></i>
+                    <input id="msgSearch" type="text" placeholder="ابحث عن محادثة..." oninput="renderMessageThreads()" />
+                  </div>
+
+                  <div class="wa-threads" id="messagesThreadList"></div>
+                </aside>
+
+                <!-- Main chat -->
+                <main class="wa-main">
+                  <div class="wa-topbar">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="wa-peer" id="chatPeerAvatar"></div>
+                      <div>
+                        <div class="wa-peer-name" id="chatPeerName">اختر محادثة</div>
+                        <div class="wa-peer-sub" id="chatPeerSub">—</div>
+                      </div>
+                    </div>
+                    <div class="wa-top-actions">
+                      <button class="icon-btn" type="button" onclick="focusChatSearch()" title="بحث"><i class="bi bi-search"></i></button>
+                      <button class="icon-btn" type="button" onclick="toggleChatMenu()" title="المزيد"><i class="bi bi-three-dots-vertical"></i></button>
+                    </div>
+                  </div>
+
+                  <div class="wa-messages" id="messagesThreadView" role="log" aria-live="polite"></div>
+
+                  <div class="wa-inputbar">
+                    <!-- Hidden selector (used for new thread) -->
+                    <select class="form-select wa-to" id="msgToSelect" aria-label="إلى"></select>
+
+                    <button class="icon-btn" type="button" onclick="openEmojiPicker()" title="إيموجي"><i class="bi bi-emoji-smile"></i></button>
+                    <button class="icon-btn" type="button" onclick="attachFile()" title="إرفاق"><i class="bi bi-paperclip"></i></button>
+
+                    <input class="wa-text" id="msgBody" placeholder="اكتب رسالة..." onkeydown="handleMsgEnter(event)" />
+
+                    <button class="wa-send" type="button" onclick="sendInternalMessage()" title="إرسال">
+                      <i class="bi bi-send-fill"></i>
+                    </button>
+                  </div>
+
+                  <div class="wa-hint">ملاحظة: المراسلة حالياً داخل نفس الجهاز (Demo). ربطها بسيرفر/قاعدة بيانات يخليها حقيقية بين الموظفين.</div>
+                </main>
+              </div>
+            </div>
+          </section>
+        </div>
+
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6" data-aos="fade-up">
+                        <div class="footer-about">
+                            <div class="footer-logo">
+                                <img src="https://cdn-icons-png.flaticon.com/512/2173/2173475.png" alt="شركة العصر الذكي">
+                            </div>
+                            <p>نظام إدارة الموظفين المتكامل لشركة العصر الذكي، يوفر حلولاً متكاملة لإدارة جميع جوانب شؤون الموظفين.</p>
+                            <div class="social-links">
+                                <a href="#"><i class="bi bi-facebook"></i></a>
+                                <a href="#"><i class="bi bi-twitter-x"></i></a>
+                                <a href="#"><i class="bi bi-linkedin"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-2 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                        <div class="footer-links">
+                            <h4>روابط سريعة</h4>
+                            <ul>
+                                <li><a href="#" onclick="showPage('home')">الصفحة الرئيسية</a></li>
+                                <li><a href="#" onclick="showPage('about')">عن الشركة</a></li>
+                                <li><a href="#" onclick="showPage('jobs')">الوظائف</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                        <div class="footer-links">
+                            <h4>للتواصل</h4>
+                            <ul>
+                                <li><a href="#" onclick="redirectToWhatsApp()">إنشاء حساب جديد</a></li>
+                                <li><a href="#" onclick="showPage('login')">تسجيل الدخول</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                        <div class="footer-links">
+                            <h4>اتصل بنا</h4>
+                            <ul class="contact-info">
+                                <li><i class="bi bi-geo-alt"></i> بغداد، المنصور</li>
+                                <li><i class="bi bi-telephone"></i> +964 123 456 7890</li>
+                                <li><i class="bi bi-envelope"></i> grdo2697@gmail.com</li>
+                                <li><i class="bi bi-whatsapp"></i> 07838737309</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="footer-bottom">
+                    <div class="row">
+                        <div class="col-lg-12 text-center">
+                            <p class="mb-0">© 2025 نظام إدارة الموظفين - شركة العصر الذكي</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <!-- Register Modal -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">إنشاء حساب جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label class="form-label">الاسم (اختياري)</label>
+                            <input type="text" class="form-control" id="registerName" placeholder="اسمك الكامل">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">البريد الإلكتروني *</label>
+                            <input type="email" class="form-control" id="registerEmail" placeholder="example@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">كلمة المرور *</label>
+                            <input type="password" class="form-control" id="registerPassword" placeholder="********" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">إنشاء حساب</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Employee Modal (with Image Upload) -->
+    <div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="employeeModalTitle">إضافة موظف جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addEmployeeForm">
+                        <input type="hidden" id="employeeEditId" value="">
+                        <input type="hidden" id="employeePhotoBase64" value="">
+                        
+                        <div class="image-upload-container">
+                            <img id="employeePhotoPreview" class="image-preview" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="صورة الموظف">
+                            <div>
+                                <label for="employeePhotoUpload" class="image-upload-btn">
+                                    <i class="bi bi-camera"></i> رفع صورة الموظف
+                                </label>
+                                <input type="file" id="employeePhotoUpload" accept="image/*" style="display: none;" onchange="previewEmployeePhoto(event)">
+                                <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="removeEmployeePhoto()" id="removePhotoBtn" style="display: none;">
+                                    <i class="bi bi-trash"></i> حذف الصورة
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">الاسم الكامل *</label>
+                                    <input type="text" class="form-control" id="employeeName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">رقم الهوية *</label>
+                                    <input type="text" class="form-control" id="employeeIdNumber" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">رقم الهاتف *</label>
+                                    <input type="tel" class="form-control" id="employeePhone" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">البريد الإلكتروني *</label>
+                                    <input type="email" class="form-control" id="employeeEmail" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">تاريخ الميلاد *</label>
+                                    <input type="date" class="form-control" id="employeeBirthDate" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">الجنس *</label>
+                                    <select class="form-control" id="employeeGender" required>
+                                        <option value="ذكر">ذكر</option>
+                                        <option value="أنثى">أنثى</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">رقم العائلة</label>
+                                    <input type="text" class="form-control" id="employeeFamilyNumber">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">الحالة الاجتماعية *</label>
+                                    <select class="form-control" id="employeeMaritalStatus" required>
+                                        <option value="أعزب">أعزب</option>
+                                        <option value="متزوج">متزوج</option>
+                                        <option value="مطلق">مطلق</option>
+                                        <option value="أرمل">أرمل</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">الوظيفة *</label>
+                                    <input type="text" class="form-control" id="employeePosition" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">القسم *</label>
+                                    <input type="text" class="form-control" id="employeeDepartment" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">العنوان *</label>
+                            <textarea class="form-control" id="employeeAddress" rows="2" required></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">نوع الموظف *</label>
+                                    <select class="form-control" id="employeeType" required>
+                                        <option value="regular">موظف عادي</option>
+                                        <option value="manager">مدير قسم</option>
+                                        <option value="supervisor">مشرف</option>
+                                        <option value="admin">مدير نظام</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">الراتب * <small>(IQD)</small></label>
+                                    <input type="number" class="form-control" id="employeeSalary" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">حالة الموظف *</label>
+                                    <select class="form-control" id="employeeStatus" required>
+                                        <option value="active">نشط</option>
+                                        <option value="inactive">غير نشط</option>
+                                        <option value="vacation">في إجازة</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">تاريخ التعيين *</label>
+                                    <input type="date" class="form-control" id="employeeJoinDate" required>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="saveEmployeeBtn" onclick="saveEmployee()">حفظ الموظف</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Discount Modal -->
+    <div class="modal fade" id="addDiscountModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="discountModalTitle">إضافة خصم جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addDiscountForm">
+                        <input type="hidden" id="discountEditId" value="">
+                        <div class="form-group">
+                            <label class="form-label">اسم الموظف *</label>
+                            <select class="form-control" id="discountEmployeeId" required>
+                                <option value="">اختر الموظف</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">نوع الخصم *</label>
+                            <select class="form-control" id="discountType" required>
+                                <option value="تأمين صحي">تأمين صحي</option>
+                                <option value="تأمين اجتماعي">تأمين اجتماعي</option>
+                                <option value="ضريبة">ضريبة</option>
+                                <option value="قرض">قرض</option>
+                                <option value="مستحقات">مستحقات</option>
+                                <option value="أخرى">أخرى</option>
+                            </select>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">المبلغ (IQD) *</label>
+                                    <input type="number" class="form-control" id="discountAmount" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">الشهر *</label>
+                                    <input type="month" class="form-control" id="discountMonth" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">حالة الخصم *</label>
+                            <select class="form-control" id="discountStatus" required>
+                                <option value="مفعل">مفعل</option>
+                                <option value="ملغى">ملغى</option>
+                                <option value="معلق">معلق</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">ملاحظات</label>
+                            <textarea class="form-control" id="discountNotes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="saveDiscountBtn" onclick="saveDiscount()">حفظ الخصم</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Contract Modal -->
+    <div class="modal fade" id="addContractModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="contractModalTitle">إضافة عقد جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addContractForm">
+                        <input type="hidden" id="contractEditId" value="">
+                        <div class="form-group">
+                            <label class="form-label">اسم الموظف *</label>
+                            <select class="form-control" id="contractEmployeeId" required>
+                                <option value="">اختر الموظف</option>
+                            </select>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">نوع العقد *</label>
+                                    <select class="form-control" id="contractType" required>
+                                        <option value="دائم">دائم</option>
+                                        <option value="محدد المدة">محدد المدة</option>
+                                        <option value="مشروع">مشروع</option>
+                                        <option value="تدريب">تدريب</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">الراتب (IQD) *</label>
+                                    <input type="number" class="form-control" id="contractSalary" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">تاريخ البدء *</label>
+                                    <input type="date" class="form-control" id="contractStartDate" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">تاريخ الانتهاء</label>
+                                    <input type="date" class="form-control" id="contractEndDate">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">حالة العقد *</label>
+                            <select class="form-control" id="contractStatus" required>
+                                <option value="نشط">نشط</option>
+                                <option value="منتهي">منتهي</option>
+                                <option value="ملغي">ملغي</option>
+                                <option value="معلق">معلق</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">ملاحظات</label>
+                            <textarea class="form-control" id="contractNotes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="saveContractBtn" onclick="saveContract()">حفظ العقد</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Vehicle Modal -->
+    <div class="modal fade" id="addVehicleModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="vehicleModalTitle">إضافة مركبة جديدة</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addVehicleForm">
+                        <input type="hidden" id="vehicleEditId" value="">
+                        <div class="form-group">
+                            <label class="form-label">اسم الموظف *</label>
+                            <select class="form-control" id="vehicleEmployeeId" required>
+                                <option value="">اختر الموظف</option>
+                            </select>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">رقم اللوحة *</label>
+                                    <input type="text" class="form-control" id="vehiclePlateNumber" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">نوع المركبة *</label>
+                                    <select class="form-control" id="vehicleType" required>
+                                        <option value="سيدان">سيدان</option>
+                                        <option value="كروس أوفر">كروس أوفر</option>
+                                        <option value="دفع رباعي">دفع رباعي</option>
+                                        <option value="بيك أب">بيك أب</option>
+                                        <option value="شاحنة">شاحنة</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">الموديل *</label>
+                                    <input type="text" class="form-control" id="vehicleModel" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">تاريخ التسليم *</label>
+                                    <input type="date" class="form-control" id="vehicleDeliveryDate" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">حالة المركبة *</label>
+                            <select class="form-control" id="vehicleStatus" required>
+                                <option value="جديدة">جديدة</option>
+                                <option value="مستعملة">مستعملة</option>
+                                <option value="صيانة">صيانة</option>
+                                <option value="غير متاحة">غير متاحة</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">ملاحظات</label>
+                            <textarea class="form-control" id="vehicleNotes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="saveVehicleBtn" onclick="saveVehicle()">حفظ المركبة</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Rating Modal -->
+    <div class="modal fade" id="addRatingModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ratingModalTitle">إضافة تقييم جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addRatingForm">
+                        <input type="hidden" id="ratingEditId" value="">
+                        <div class="form-group">
+                            <label class="form-label">اسم الموظف *</label>
+                            <select class="form-control" id="ratingEmployeeId" required>
+                                <option value="">اختر الموظف</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">التقييم الرقمي (0 - 10) *</label>
+                            <div class="row g-2 align-items-center">
+                                <div class="col-12 col-md-6">
+                                    <input type="number" class="form-control" id="ratingNumeric" min="0" max="10" step="0.1" value="0" required>
+                                    <small class="text-muted">مثال: 5.5 أو 6.7</small>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="alert alert-light border mb-0" style="font-size:14px;">
+                                        هذا النظام يعتمد تقييمات <b>رقمية</b> وليس نجوم.
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="ratingValue" value="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">التعليق *</label>
+                            <textarea class="form-control" id="ratingComment" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">المقيم *</label>
+                            <input type="text" class="form-control" id="ratingReviewer" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">معايير التقييم (اضغط Enter بعد كل معيار)</label>
+                            <input type="text" class="form-control" id="ratingCriteriaInput" placeholder="أدخل معيار ثم اضغط Enter">
+                            <div class="mt-2" id="selectedCriteria">
+                                <!-- Selected criteria will appear here -->
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="saveRatingBtn" onclick="saveRating()">حفظ التقييم</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userModalTitle">إضافة مستخدم جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addUserForm">
+                        <input type="hidden" id="userEditId" value="">
+                        <div class="form-group">
+                            <label class="form-label">الاسم الكامل *</label>
+                            <input type="text" class="form-control" id="userName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">البريد الإلكتروني *</label>
+                            <input type="email" class="form-control" id="userEmail" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">كلمة المرور *</label>
+                            <input type="password" class="form-control" id="userPassword" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">نوع الحساب *</label>
+                            <select class="form-control" id="userRole" required>
+                                <option value="employee">موظف</option>
+                                <option value="manager">مدير قسم</option>
+                                <option value="hr">موارد بشرية</option>
+                                <option value="admin">مدير نظام</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">ربط بحساب موظف (اختياري)</label>
+                            <select class="form-control" id="userEmployeeId">
+                                <option value="">اختر الموظف</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="saveUserBtn" onclick="saveUser()">حفظ المستخدم</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Role Modal -->
+    <div class="modal fade" id="addRoleModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="roleModalTitle">إضافة دور جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addRoleForm">
+                        <input type="hidden" id="roleEditId" value="">
+                        <div class="form-group">
+                            <label class="form-label">اسم الدور *</label>
+                            <input type="text" class="form-control" id="roleName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">معرف الدور *</label>
+                            <input type="text" class="form-control" id="roleId" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">وصف الدور</label>
+                            <textarea class="form-control" id="roleDescription" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">الصلاحيات</label>
+                            <div class="permissions-grid" id="rolePermissions">
+                                <!-- Will be populated by JS -->
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="saveRoleBtn" onclick="saveRole()">حفظ الدور</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit My Info Modal -->
+    <div class="modal fade" id="editMyInfoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">تعديل معلوماتي الشخصية</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editMyInfoForm">
+                        <input type="hidden" id="myInfoEmployeeId" value="">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">رقم الهاتف</label>
+                                    <input type="tel" class="form-control" id="myInfoPhone">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">البريد الإلكتروني</label>
+                                    <input type="email" class="form-control" id="myInfoEmail">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">رقم العائلة</label>
+                                    <input type="text" class="form-control" id="myInfoFamilyNumber">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">الحالة الاجتماعية</label>
+                                    <select class="form-control" id="myInfoMaritalStatus">
+                                        <option value="أعزب">أعزب</option>
+                                        <option value="متزوج">متزوج</option>
+                                        <option value="مطلق">مطلق</option>
+                                        <option value="أرمل">أرمل</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">العنوان</label>
+                            <textarea class="form-control" id="myInfoAddress" rows="2"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-primary" onclick="updateMyInfo()">حفظ التغييرات</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Details Modal -->
+    <div class="modal fade" id="viewDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewDetailsTitle">تفاصيل</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="viewDetailsContent">
+                    <!-- Content will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Chat Floating Button -->
+    <button class="ai-chat-fab" type="button" onclick="openAiChat()" aria-label="محادثة AI">
+        <i class="bi bi-chat-dots"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <!-- EmailJS for sending emails -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <script type="module" src="assets/js/app.js"></script>
+</body>
+</html>

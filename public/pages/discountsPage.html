@@ -1,0 +1,70 @@
+<div class="page-container" id="discountsPage">
+<!-- Hero Section -->
+<section class="page-hero">
+<div class="container">
+<div class="row">
+<div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+<h1>إدارة الخصومات</h1>
+<p class="lead">تسجيل ومتابعة جميع الخصومات الشهرية للموظفين</p>
+</div>
+</div>
+</div>
+</section>
+<section class="page-content">
+<div class="container">
+<!-- Search and Filter Section -->
+<div class="search-filter-container" data-aos="fade-up">
+<div class="row">
+<div class="col-md-6">
+<div class="search-box">
+<input class="form-control" id="discountsSearch" placeholder="ابحث باسم الموظف أو نوع الخصم..." type="text"/>
+<i class="bi bi-search"></i>
+</div>
+</div>
+<div class="col-md-3">
+<input class="form-control" id="discountsMonthFilter" placeholder="الشهر" type="month"/>
+</div>
+<div class="col-md-3">
+<select class="form-control" id="discountsStatusFilter">
+<option value="">جميع الحالات</option>
+<option value="مفعل">مفعل</option>
+<option value="ملغى">ملغى</option>
+<option value="معلق">معلق</option>
+</select>
+</div>
+</div>
+</div>
+<div class="service-card" data-aos="fade-up">
+<div class="d-flex justify-content-between align-items-center mb-4">
+<h3 class="mb-0">سجل الخصومات</h3>
+<button class="btn btn-primary" onclick="showAddDiscountModal()">
+<i class="bi bi-plus-circle"></i> إضافة خصم جديد
+                            </button>
+</div>
+<div class="table-responsive">
+<table class="data-table">
+<thead>
+<tr>
+<th>رقم الخصم</th>
+<th>اسم الموظف</th>
+<th>نوع الخصم</th>
+<th>المبلغ</th>
+<th>الشهر</th>
+<th>الحالة</th>
+<th>التاريخ</th>
+<th>الإجراءات</th>
+</tr>
+</thead>
+<tbody id="discountsTableBody">
+<!-- Will be populated by JS -->
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="pagination-container" id="discountsPagination">
+<!-- Pagination will be added by JavaScript -->
+</div>
+</div>
+</div>
+</section>
+</div>

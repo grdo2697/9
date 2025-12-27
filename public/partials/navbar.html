@@ -1,0 +1,80 @@
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+<div class="container">
+<a class="navbar-brand" href="#" onclick="showPage('home')">
+<img alt="شركة العصر الذكي" class="logo-image" src="assets/img/logo.png"/>
+<div class="d-flex flex-column">
+<strong class="logo-text">العصر الذكي</strong>
+<small class="logo-slogan">نظام إدارة الموظفين المتكامل</small>
+</div>
+</a>
+<button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarNav">
+<ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link active" href="#" onclick="showPage('home')">الصفحة الرئيسية</a></li>
+<li class="nav-item guest-only"><a class="nav-link" href="#" onclick="showPage('about')">عن الشركة</a></li>
+<li class="nav-item guest-only"><a class="nav-link" href="#" onclick="showPage('jobs')">الوظائف</a></li>
+<!-- User Only Links (Hidden from Guests) -->
+<li class="nav-item user-only"><a class="nav-link" href="#" onclick="showPage('myInfo')">معلوماتي</a></li>
+<li class="nav-item user-only manager-only hr-only admin-only"><a class="nav-link" href="#" onclick="showPage('employees')">الموظفين</a></li>
+<li class="nav-item user-only"><a class="nav-link" href="#" onclick="showPage('myDiscounts')">خصوماتي</a></li>
+<li class="nav-item user-only manager-only hr-only admin-only"><a class="nav-link" href="#" onclick="showPage('discounts')">الخصومات</a></li>
+<li class="nav-item user-only"><a class="nav-link" href="#" onclick="showPage('myContract')">عقدي</a></li>
+<li class="nav-item user-only manager-only hr-only admin-only"><a class="nav-link" href="#" onclick="showPage('contracts')">العقود</a></li>
+<li class="nav-item user-only"><a class="nav-link" href="#" onclick="showPage('myVehicle')">مركبتي</a></li>
+<li class="nav-item user-only manager-only hr-only admin-only"><a class="nav-link" href="#" onclick="showPage('vehicles')">المركبات</a></li>
+<li class="nav-item user-only"><a class="nav-link" href="#" onclick="showPage('myRatings')">تقييمي</a></li>
+<li class="nav-item user-only manager-only hr-only admin-only"><a class="nav-link" href="#" onclick="showPage('ratings')">التقييمات</a></li>
+<!-- Admin Only Links -->
+<li class="nav-item user-only admin-only"><a class="nav-link" href="#" onclick="showPage('dashboard')">لوحة التحكم</a></li>
+<li class="nav-item user-only admin-only"><a class="nav-link" href="#" onclick="showPage('advancedDashboard')">داشبورد متقدم</a></li>
+<li class="nav-item user-only admin-only"><a class="nav-link" href="#" onclick="showPage('users')">إدارة المستخدمين</a></li>
+<li class="nav-item user-only admin-only"><a class="nav-link" href="#" onclick="showPage('permissions')">إدارة الصلاحيات</a></li>
+<li class="nav-item user-only admin-only"><a class="nav-link" href="#" onclick="showPage('reports')">التقارير</a></li>
+</ul>
+<ul class="navbar-nav">
+<li class="nav-item guest-only">
+<a class="nav-link" href="#" onclick="showPage('login')">تسجيل الدخول</a>
+</li>
+<li class="nav-item user-only nav-icon-item">
+  <a class="nav-link nav-icon-btn" href="#" onclick="showPage('messages'); return false;" title="المراسلات">
+    <i class="bi bi-chat-dots"></i>
+    <span class="nav-badge" id="navMsgBadge" style="display:none">0</span>
+  </a>
+</li>
+<li class="nav-item user-only nav-icon-item">
+  <a class="nav-link nav-icon-btn" href="#" onclick="toggleNotifPanel(); return false;" title="الإشعارات">
+    <i class="bi bi-bell"></i>
+    <span class="nav-badge" id="navNotifBadge" style="display:none">0</span>
+  </a>
+  <div class="notif-panel" id="notifPanelWrapper">
+    <div id="notifPanel"></div>
+  </div>
+</li>
+
+    <li><hr class="dropdown-divider"></li>
+    <li><div class="px-3 py-2 text-muted" id="navNotifsList">لا توجد إشعارات</div></li>
+  </ul>
+</li>
+
+<li class="nav-item user-only user-dropdown">
+<div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()">
+<!-- Initials will be set by JS -->
+</div>
+<div class="user-menu" id="userMenu">
+<a class="user-menu-item" href="#" onclick="showPage('profile')">
+<i class="bi bi-person"></i> الملف الشخصي
+                                </a>
+<a class="user-menu-item admin-only" href="#" onclick="showPage('settings')">
+<i class="bi bi-gear"></i> الإعدادات
+                                </a>
+<div class="user-menu-item" onclick="logout()">
+<i class="bi bi-box-arrow-left"></i> تسجيل الخروج
+                                </div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</nav>

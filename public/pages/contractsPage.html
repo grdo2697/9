@@ -1,0 +1,77 @@
+<div class="page-container" id="contractsPage">
+<!-- Hero Section -->
+<section class="page-hero">
+<div class="container">
+<div class="row">
+<div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+<h1>إدارة العقود</h1>
+<p class="lead">متابعة عقود العمل وتجديدها وإنهائها</p>
+</div>
+</div>
+</div>
+</section>
+<section class="page-content">
+<div class="container">
+<!-- Search and Filter Section -->
+<div class="search-filter-container" data-aos="fade-up">
+<div class="row">
+<div class="col-md-6">
+<div class="search-box">
+<input class="form-control" id="contractsSearch" placeholder="ابحث باسم الموظف أو نوع العقد..." type="text"/>
+<i class="bi bi-search"></i>
+</div>
+</div>
+<div class="col-md-3">
+<select class="form-control" id="contractsTypeFilter">
+<option value="">جميع الأنواع</option>
+<option value="دائم">دائم</option>
+<option value="محدد المدة">محدد المدة</option>
+<option value="مشروع">مشروع</option>
+<option value="تدريب">تدريب</option>
+</select>
+</div>
+<div class="col-md-3">
+<select class="form-control" id="contractsStatusFilter">
+<option value="">جميع الحالات</option>
+<option value="نشط">نشط</option>
+<option value="منتهي">منتهي</option>
+<option value="ملغي">ملغي</option>
+<option value="معلق">معلق</option>
+</select>
+</div>
+</div>
+</div>
+<div class="service-card" data-aos="fade-up">
+<div class="d-flex justify-content-between align-items-center mb-4">
+<h3 class="mb-0">قائمة العقود</h3>
+<button class="btn btn-primary" onclick="showAddContractModal()">
+<i class="bi bi-plus-circle"></i> إضافة عقد جديد
+                            </button>
+</div>
+<div class="table-responsive">
+<table class="data-table">
+<thead>
+<tr>
+<th>رقم العقد</th>
+<th>اسم الموظف</th>
+<th>نوع العقد</th>
+<th>تاريخ البدء</th>
+<th>تاريخ الانتهاء</th>
+<th>الراتب</th>
+<th>الحالة</th>
+<th>الإجراءات</th>
+</tr>
+</thead>
+<tbody id="contractsTableBody">
+<!-- Will be populated by JS -->
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="pagination-container" id="contractsPagination">
+<!-- Pagination will be added by JavaScript -->
+</div>
+</div>
+</div>
+</section>
+</div>

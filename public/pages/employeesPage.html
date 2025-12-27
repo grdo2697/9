@@ -1,0 +1,57 @@
+<div class="page-container" id="employeesPage">
+<!-- Hero Section -->
+<section class="page-hero">
+<div class="container">
+<div class="row">
+<div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+<h1>إدارة الموظفين</h1>
+<p class="lead">السجل الكامل لموظفي الشركة مع جميع المعلومات</p>
+</div>
+</div>
+</div>
+</section>
+<section class="page-content">
+<div class="container">
+<!-- Search and Filter Section -->
+<div class="search-filter-container" data-aos="fade-up">
+<div class="row">
+<div class="col-md-8">
+<div class="search-box">
+<input class="form-control" id="employeeSearch" placeholder="ابحث عن موظف بالاسم، الوظيفة، أو القسم..." type="text"/>
+<i class="bi bi-search"></i>
+</div>
+</div>
+<div class="col-md-4">
+<select class="form-control" id="employeeStatusFilter">
+<option value="">جميع الحالات</option>
+<option value="active">نشط</option>
+<option value="inactive">غير نشط</option>
+<option value="vacation">في إجازة</option>
+</select>
+</div>
+</div>
+<div class="filter-options">
+<button class="filter-btn active" data-filter="all">الكل</button>
+<button class="filter-btn" data-filter="manager">مديرون</button>
+<button class="filter-btn" data-filter="regular">موظفون عاديون</button>
+<button class="filter-btn" data-filter="supervisor">مشرفون</button>
+</div>
+</div>
+<div class="service-card" data-aos="fade-up">
+<div class="d-flex justify-content-between align-items-center mb-4">
+<h3 class="mb-0">قائمة الموظفين</h3>
+<button class="btn btn-primary" onclick="showAddEmployeeModal()">
+<i class="bi bi-plus-circle"></i> إضافة موظف جديد
+                            </button>
+</div>
+<div class="row" id="employeesContainer">
+<!-- Employees will be loaded here -->
+</div>
+<!-- Pagination -->
+<div class="pagination-container" id="employeesPagination">
+<!-- Pagination will be added by JavaScript -->
+</div>
+</div>
+</div>
+</section>
+</div>

@@ -1,0 +1,1792 @@
+<div class="page-container" id="messagesPage">
+  <section class="page-hero">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 text-center page-hero-content" data-aos="fade-up">
+          <h1>المراسلات الداخلية</h1>
+          <p class="lead">تواصل سريع وآمن بين موظفي الشركة داخل النظام</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page-content">
+    <div class="container">
+      <div class="messages-shell">
+        <!-- Sidebar (threads) -->
+        <aside class="messages-sidebar">
+          <div class="sidebar-header">
+            <div class="sidebar-title">
+              <i class="bi bi-chat-left-text-fill"></i>
+              <span>المحادثات</span>
+            </div>
+            <div class="sidebar-actions">
+              <button class="btn btn-sm btn-outline-primary" type="button" onclick="startNewThread()" title="محادثة جديدة">
+                <i class="bi bi-pencil-square"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-secondary" type="button" onclick="refreshThreads()" title="تحديث المحادثات">
+                <i class="bi bi-arrow-clockwise"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="sidebar-search">
+            <div class="search-icon">
+              <i class="bi bi-search"></i>
+            </div>
+            <input class="form-control search-input" id="msgSearch" placeholder="ابحث في المحادثات..." oninput="renderMessageThreads()" />
+            <button class="btn btn-clear-search" id="clearSearchBtn" onclick="clearSearch()" title="مسح البحث">
+              <i class="bi bi-x"></i>
+            </button>
+          </div>
+
+          <div class="thread-list-header">
+            <div class="thread-list-title">المحادثات النشطة</div>
+            <div class="thread-list-count" id="threadCount">0 محادثة</div>
+          </div>
+
+          <div class="thread-list" id="messagesThreadList">
+            <!-- سيتم تعبئتها بالـ JavaScript -->
+          </div>
+
+          <div class="sidebar-footer">
+            <div class="user-profile">
+              <div class="avatar" id="sidebarUserAvatar"></div>
+              <div class="user-info">
+                <div class="user-name" id="sidebarUserName">اسم المستخدم</div>
+                <div class="user-status">
+                  <span class="status-indicator" id="sidebarUserStatus"></span>
+                  <span id="sidebarStatusText">جاهز</span>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-sm btn-settings" type="button" onclick="openChatSettings()" title="إعدادات المراسلة">
+              <i class="bi bi-gear-fill"></i>
+            </button>
+          </div>
+        </aside>
+
+        <!-- Chat area -->
+        <section class="messages-chat">
+          <div class="chat-header" id="chatHeader">
+            <div class="chat-peer">
+              <div class="avatar" id="chatPeerAvatar">
+                <i class="bi bi-person-circle"></i>
+              </div>
+              <div class="meta">
+                <div class="name" id="chatPeerName">اختر محادثة</div>
+                <div class="status" id="chatPeerStatus">
+                  <span class="status-dot"></span>
+                  <span id="chatPeerStatusText">اختر محادثة للبدء</span>
+                </div>
+              </div>
+            </div>
+            <div class="chat-actions">
+              <button class="btn btn-action" type="button" onclick="toggleChatInfo()" title="معلومات المحادثة">
+                <i class="bi bi-info-circle"></i>
+              </button>
+              <button class="btn btn-action" type="button" onclick="searchInChat()" title="بحث في المحادثة">
+                <i class="bi bi-search"></i>
+              </button>
+              <button class="btn btn-action" type="button" onclick="clearThread()" title="مسح المحادثة">
+                <i class="bi bi-trash3"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Chat info panel (hidden by default) -->
+          <div class="chat-info-panel" id="chatInfoPanel">
+            <div class="chat-info-header">
+              <h6>معلومات المحادثة</h6>
+              <button class="btn btn-sm" onclick="toggleChatInfo()">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+            <div class="chat-info-content">
+              <div class="chat-info-avatar">
+                <div class="avatar-lg" id="chatInfoAvatar"></div>
+              </div>
+              <div class="chat-info-name" id="chatInfoName">اسم المستخدم</div>
+              <div class="chat-info-status" id="chatInfoStatus">جاهز</div>
+              <hr />
+              <div class="chat-info-section">
+                <h6>تفاصيل المحادثة</h6>
+                <div class="info-item">
+                  <span class="info-label">عدد الرسائل:</span>
+                  <span class="info-value" id="chatMessageCount">0</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">أنشئت في:</span>
+                  <span class="info-value" id="chatCreatedAt">--/--/----</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">آخر نشاط:</span>
+                  <span class="info-value" id="chatLastActivity">--:--</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-messages-container">
+            <div class="chat-messages" id="messagesThreadView">
+              <!-- سيتم تعبئتها بالـ JavaScript -->
+            </div>
+          </div>
+
+          <!-- Compose area -->
+          <div class="chat-compose">
+            <div class="compose-left">
+              <button class="btn btn-attach" type="button" onclick="attachFile()" title="إرفاق ملف">
+                <i class="bi bi-paperclip"></i>
+              </button>
+              <button class="btn btn-emoji" type="button" onclick="toggleEmojiPicker()" title="إضافة إيموجي">
+                <i class="bi bi-emoji-smile"></i>
+              </button>
+            </div>
+            <div class="compose-center">
+              <div class="compose-input-wrapper">
+                <input class="form-control" id="msgBody" placeholder="اكتب رسالة..." 
+                  onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); sendInternalMessage(); }" />
+                <!-- Emoji picker (hidden by default) -->
+                <div class="emoji-picker" id="emojiPicker">
+                  <div class="emoji-picker-header">
+                    <span>الإيموجي</span>
+                    <button class="btn btn-sm" onclick="toggleEmojiPicker()">
+                      <i class="bi bi-x"></i>
+                    </button>
+                  </div>
+                  <div class="emoji-picker-content">
+                    <button class="emoji-btn" onclick="insertEmoji('😊')">😊</button>
+                    <button class="emoji-btn" onclick="insertEmoji('👍')">👍</button>
+                    <button class="emoji-btn" onclick="insertEmoji('❤️')">❤️</button>
+                    <button class="emoji-btn" onclick="insertEmoji('😂')">😂</button>
+                    <button class="emoji-btn" onclick="insertEmoji('😎')">😎</button>
+                    <button class="emoji-btn" onclick="insertEmoji('🤔')">🤔</button>
+                    <button class="emoji-btn" onclick="insertEmoji('🙏')">🙏</button>
+                    <button class="emoji-btn" onclick="insertEmoji('🔥')">🔥</button>
+                    <button class="emoji-btn" onclick="insertEmoji('🎉')">🎉</button>
+                    <button class="emoji-btn" onclick="insertEmoji('💯')">💯</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="compose-right">
+              <button class="btn btn-primary btn-send" type="button" onclick="sendInternalMessage()" id="sendMessageBtn" aria-label="إرسال">
+                <i class="bi bi-send-fill"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="chat-hint text-muted">
+            <i class="bi bi-info-circle"></i>
+            نظام مراسلة داخلي آمن. يمكن ربطه بقاعدة البيانات لاحقاً.
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Modal for starting new thread -->
+<div class="modal fade" id="newThreadModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">بدء محادثة جديدة</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">اختر موظفاً:</label>
+          <select class="form-select" id="newThreadEmployeeSelect">
+            <!-- سيتم تعبئتها بالـ JavaScript -->
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">الرسالة الأولى:</label>
+          <textarea class="form-control" id="newThreadMessage" rows="3" placeholder="اكتب رسالتك الأولى..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+        <button type="button" class="btn btn-primary" onclick="createNewThread()">بدء المحادثة</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WhatsApp-like Chat Settings Modal -->
+<div class="modal fade" id="waChatSettingsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">إعدادات المراسلة</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#waTabAccount" type="button" role="tab">الحساب</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#waTabPrivacy" type="button" role="tab">الخصوصية</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#waTabChats" type="button" role="tab">الدردشات</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#waTabNotifs" type="button" role="tab">الإشعارات</button>
+          </li>
+        </ul>
+
+        <div class="tab-content pt-3">
+          <div class="tab-pane fade show active" id="waTabAccount" role="tabpanel">
+            <div class="row g-3 align-items-center">
+              <div class="col-md-4 text-center">
+                <div class="wa-profile-avatar" id="waProfileAvatar">
+                  <i class="bi bi-person-circle"></i>
+                </div>
+                <input type="file" class="form-control mt-2" id="waProfileAvatarFile" accept="image/*" />
+                <button class="btn btn-outline-secondary btn-sm mt-2" type="button" onclick="document.getElementById('waProfileAvatarFile').click()">تغيير الصورة</button>
+              </div>
+              <div class="col-md-8">
+                <label class="form-label">الاسم</label>
+                <input class="form-control" id="waProfileName" />
+                <label class="form-label mt-2">الحالة</label>
+                <input class="form-control" id="waProfileStatus" placeholder="مثل: متاح للعمل" />
+                <div class="mt-3">
+                  <button class="btn btn-primary" type="button" onclick="saveChatProfile()">حفظ التغييرات</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-pane fade" id="waTabPrivacy" role="tabpanel">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">آخر ظهور</label>
+                <select class="form-select" id="waPrivacyLastSeen">
+                  <option value="everyone">الجميع</option>
+                  <option value="contacts">جهات الاتصال</option>
+                  <option value="nobody">لا أحد</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">إيصالات القراءة</label>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="waPrivacyReadReceipts" checked />
+                  <label class="form-check-label" for="waPrivacyReadReceipts">تفعيل</label>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <label class="form-label">صورة البروفايل</label>
+                <select class="form-select" id="waProfileVisibility">
+                  <option value="everyone">الجميع</option>
+                  <option value="contacts">جهات الاتصال</option>
+                  <option value="nobody">لا أحد</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-pane fade" id="waTabChats" role="tabpanel">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">خلفية الدردشة</label>
+                <select class="form-select" id="waChatWallpaper">
+                  <option value="wa1">واتساب (غامق)</option>
+                  <option value="wa2">نقشة فاتحة</option>
+                  <option value="solid">لون سادة</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">حجم الخط</label>
+                <select class="form-select" id="waChatFontSize">
+                  <option value="sm">صغير</option>
+                  <option value="md" selected>متوسط</option>
+                  <option value="lg">كبير</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">حفظ الوسائط تلقائياً</label>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="waAutoSaveMedia" />
+                  <label class="form-check-label" for="waAutoSaveMedia">تفعيل</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">عرض المعاينة</label>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="waShowPreviews" checked />
+                  <label class="form-check-label" for="waShowPreviews">تفعيل</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <button class="btn btn-primary" type="button" onclick="saveChatSettings()">حفظ الإعدادات</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-pane fade" id="waTabNotifs" role="tabpanel">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">الإشعارات</label>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="waNotifEnabled" checked />
+                  <label class="form-check-label" for="waNotifEnabled">تفعيل الإشعارات</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">الصوت</label>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="waNotifSound" checked />
+                  <label class="form-check-label" for="waNotifSound">تفعيل الصوت</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">الاهتزاز</label>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="waNotifVibrate" checked />
+                  <label class="form-check-label" for="waNotifVibrate">تفعيل الاهتزاز</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">نغمة الإشعار</label>
+                <select class="form-select" id="waNotifTone">
+                  <option value="default">النغمة الافتراضية</option>
+                  <option value="chime">نغمة رنين</option>
+                  <option value="beep">نغمة بيب</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <button class="btn btn-primary" type="button" onclick="saveChatSettings()">حفظ الإعدادات</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for chat search -->
+<div class="modal fade" id="chatSearchModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">بحث في المحادثة</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">ابحث في رسائل هذه المحادثة:</label>
+          <input class="form-control" id="chatSearchInput" placeholder="اكثر كلمة للبحث..." />
+        </div>
+        <div class="search-results" id="chatSearchResults">
+          <!-- سيتم تعبئتها بالـ JavaScript -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+        <button type="button" class="btn btn-primary" onclick="performChatSearch()">بحث</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* تحسينات التصميم لتبدو مثل واتساب */
+  .messages-shell {
+    display: flex;
+    height: 75vh;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+  }
+  
+  .messages-sidebar {
+    width: 350px;
+    border-right: 1px solid #e1e1e1;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+  }
+  
+  .sidebar-header {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f2f5;
+    border-bottom: 1px solid #e1e1e1;
+  }
+  
+  .sidebar-title {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: #333;
+  }
+  
+  .sidebar-title i {
+    margin-left: 8px;
+    color: #25D366;
+  }
+  
+  .sidebar-actions {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .sidebar-search {
+    padding: 10px 15px;
+    position: relative;
+    background-color: #f0f2f5;
+    border-bottom: 1px solid #e1e1e1;
+  }
+  
+  .search-icon {
+    position: absolute;
+    right: 25px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+  }
+  
+  .search-input {
+    padding-right: 35px;
+    background-color: #fff;
+    border: 1px solid #e1e1e1;
+    border-radius: 20px;
+  }
+  
+  .btn-clear-search {
+    position: absolute;
+    left: 25px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #666;
+    display: none;
+  }
+  
+  .thread-list-header {
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e1e1e1;
+    background-color: #f8f9fa;
+  }
+  
+  .thread-list-title {
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .thread-list-count {
+    font-size: 0.85rem;
+    color: #666;
+  }
+  
+  .thread-list {
+    flex: 1;
+    overflow-y: auto;
+    background-color: #fff;
+  }
+  
+  .thread-item {
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #f5f5f5;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .thread-item:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .thread-item.active {
+    background-color: #e8f5e9;
+    border-right: 3px solid #25D366;
+  }
+  
+  .thread-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e1e1e1;
+    color: #666;
+    font-size: 1.5rem;
+    margin-left: 12px;
+  }
+  
+  .thread-content {
+    flex: 1;
+  }
+  
+  .thread-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  
+  .thread-name {
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .thread-time {
+    font-size: 0.8rem;
+    color: #666;
+  }
+  
+  .thread-preview {
+    font-size: 0.9rem;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .thread-unread {
+    background-color: #25D366;
+    color: white;
+    font-size: 0.7rem;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: auto;
+  }
+  
+  .sidebar-footer {
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f2f5;
+    border-top: 1px solid #e1e1e1;
+  }
+  
+  .user-profile {
+    display: flex;
+    align-items: center;
+  }
+  
+  .user-info {
+    margin-right: 10px;
+  }
+  
+  .user-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  
+  .user-status {
+    display: flex;
+    align-items: center;
+    font-size: 0.8rem;
+    color: #666;
+  }
+  
+  .status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #25D366;
+    margin-left: 5px;
+  }
+  
+  .btn-settings {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 1.2rem;
+  }
+  
+  .messages-chat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #f0f2f5;
+    position: relative;
+  }
+  
+  .chat-header {
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f2f5;
+    border-bottom: 1px solid #e1e1e1;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  
+  .chat-peer {
+    display: flex;
+    align-items: center;
+  }
+  
+  .chat-peer .avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e1e1e1;
+    color: #666;
+    font-size: 1.5rem;
+    margin-left: 12px;
+  }
+  
+  .meta .name {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #333;
+  }
+  
+  .meta .status {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #666;
+  }
+  
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #25D366;
+    margin-left: 5px;
+  }
+  
+  .chat-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .btn-action {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 1.2rem;
+  }
+  
+  .chat-messages-container {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNlZGVlZWUiIGZpbGwtb3BhY2l0eT0iMC40Ij48cGF0aCBkPSJNNDAgMEgyMEM4Ljk1NCAwIDAgOC45NTQgMCAyMGMwIDExLjA0NiA4Ljk1NCAyMCAyMCAyMGgxMGMxMS4wNDYgMCAyMC04Ljk1NCAyMC0yMHMtOC45NTQtMjAtMjAtMjB6TTIwIDJjOS45NDEgMCAxOCA4LjA1OSAxOCAxOHMtOC4wNTkgMTgtMTggMThINmMtOS45NDEgMC0xOC04LjA1OS0xOC0xOHM4LjA1OS0xOCAxOC0xOGgxNHoiLz48L2c+PC9nPjwvc3ZnPg==');
+    background-size: 60px 60px;
+    background-color: #efeae2;
+  }
+  
+  .chat-messages {
+    padding: 20px;
+    overflow-y: auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .message {
+    max-width: 65%;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .message.sent {
+    align-self: flex-end;
+  }
+  
+  .message.received {
+    align-self: flex-start;
+  }
+  
+  .message-bubble {
+    padding: 8px 12px;
+    border-radius: 18px;
+    position: relative;
+    word-wrap: break-word;
+  }
+  
+  .message.sent .message-bubble {
+    background-color: #d9fdd3;
+    border-top-right-radius: 5px;
+  }
+  
+  .message.received .message-bubble {
+    background-color: #fff;
+    border-top-left-radius: 5px;
+  }
+  
+  .message-time {
+    font-size: 0.7rem;
+    color: #666;
+    margin-top: 3px;
+    align-self: flex-end;
+  }
+  
+  .message.sent .message-time {
+    text-align: left;
+  }
+  
+  .message.received .message-time {
+    text-align: right;
+  }
+  
+  .message-date {
+    text-align: center;
+    margin: 15px 0;
+    color: #666;
+    font-size: 0.8rem;
+    position: relative;
+  }
+  
+  .message-date::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: #e1e1e1;
+    z-index: 1;
+  }
+  
+  .message-date span {
+    background-color: #f0f2f5;
+    padding: 0 10px;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .chat-compose {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    background-color: #f0f2f5;
+    border-top: 1px solid #e1e1e1;
+  }
+  
+  .compose-left, .compose-right {
+    flex: 0 0 auto;
+  }
+  
+  .compose-center {
+    flex: 1;
+    margin: 0 12px;
+    position: relative;
+  }
+  
+  .btn-attach, .btn-emoji, .btn-send {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+  }
+  
+  .btn-attach, .btn-emoji {
+    background-color: transparent;
+    color: #666;
+    font-size: 1.2rem;
+  }
+  
+  .btn-send {
+    background-color: #25D366;
+    color: white;
+  }
+  
+  .compose-input-wrapper {
+    position: relative;
+  }
+  
+  .emoji-picker {
+    position: absolute;
+    bottom: 50px;
+    left: 0;
+    width: 250px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e1e1e1;
+    z-index: 1000;
+    display: none;
+  }
+  
+  .emoji-picker-header {
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e1e1e1;
+  }
+  
+  .emoji-picker-content {
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  
+  .emoji-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .emoji-btn:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .chat-info-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100%;
+    background-color: white;
+    border-left: 1px solid #e1e1e1;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.05);
+    z-index: 100;
+    display: none;
+    flex-direction: column;
+  }
+  
+  .chat-info-header {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e1e1e1;
+  }
+  
+  .chat-info-content {
+    padding: 20px;
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  .chat-info-avatar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+  
+  .avatar-lg {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e1e1e1;
+    color: #666;
+    font-size: 3rem;
+  }
+  
+  .chat-info-name {
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+  }
+  
+  .chat-info-status {
+    text-align: center;
+    color: #666;
+    margin-bottom: 20px;
+  }
+  
+  .chat-info-section {
+    margin-top: 20px;
+  }
+  
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f5f5f5;
+  }
+  
+  .info-label {
+    color: #666;
+  }
+  
+  .info-value {
+    font-weight: 500;
+  }
+  
+  .chat-hint {
+    padding: 8px 20px;
+    background-color: #fff8e1;
+    font-size: 0.8rem;
+    text-align: center;
+    border-top: 1px solid #ffe082;
+  }
+  
+  .chat-hint i {
+    margin-left: 5px;
+  }
+  
+  .wa-profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #e1e1e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: #666;
+    margin: 0 auto;
+  }
+  
+  @media (max-width: 992px) {
+    .messages-shell {
+      flex-direction: column;
+      height: 85vh;
+    }
+    
+    .messages-sidebar {
+      width: 100%;
+      height: 40%;
+    }
+    
+    .messages-chat {
+      height: 60%;
+    }
+    
+    .chat-info-panel {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  // متغيرات عامة
+  let currentUser = {
+    id: 1,
+    name: "أحمد محمد",
+    email: "ahmed@company.com",
+    avatar: "",
+    status: "متاح للعمل",
+    lastSeen: "everyone",
+    readReceipts: true
+  };
+  
+  let employees = [
+    { id: 2, name: "سارة علي", email: "sara@company.com", status: "متصل", lastSeen: "10:15", avatar: "" },
+    { id: 3, name: "محمد خالد", email: "mohamed@company.com", status: "في اجتماع", lastSeen: "09:45", avatar: "" },
+    { id: 4, name: "فاطمة حسن", email: "fatima@company.com", status: "بعيد", lastSeen: "أمس", avatar: "" },
+    { id: 5, name: "خالد عمر", email: "khaled@company.com", status: "متاح", lastSeen: "08:30", avatar: "" },
+    { id: 6, name: "نورة سعيد", email: "nora@company.com", status: "متصل", lastSeen: "الآن", avatar: "" },
+    { id: 7, name: "يوسف أحمد", email: "youssef@company.com", status: "مشغول", lastSeen: "11:20", avatar: "" }
+  ];
+  
+  let messageThreads = [];
+  let activeThreadId = null;
+  let chatSettings = {
+    wallpaper: "wa1",
+    fontSize: "md",
+    autoSaveMedia: false,
+    showPreviews: true,
+    notifications: true,
+    sound: true,
+    vibrate: true,
+    tone: "default"
+  };
+  
+  // تهيئة الصفحة
+  document.addEventListener('DOMContentLoaded', function() {
+    loadUserData();
+    loadChatSettings();
+    loadMessageThreads();
+    renderMessageThreads();
+    updateUserProfileUI();
+    
+    // تحديث حالة المستخدم كل 30 ثانية
+    setInterval(updateUserStatus, 30000);
+    
+    // تحديث وقت آخر ظهور
+    setInterval(updateLastSeen, 60000);
+  });
+  
+  // تحميل بيانات المستخدم من localStorage
+  function loadUserData() {
+    const savedUser = localStorage.getItem('chatUser');
+    if (savedUser) {
+      currentUser = { ...currentUser, ...JSON.parse(savedUser) };
+    }
+  }
+  
+  // حفظ بيانات المستخدم في localStorage
+  function saveUserData() {
+    localStorage.setItem('chatUser', JSON.stringify(currentUser));
+  }
+  
+  // تحميل إعدادات الدردشة
+  function loadChatSettings() {
+    const savedSettings = localStorage.getItem('chatSettings');
+    if (savedSettings) {
+      chatSettings = JSON.parse(savedSettings);
+    }
+  }
+  
+  // حفظ إعدادات الدردشة
+  function saveChatSettings() {
+    localStorage.setItem('chatSettings', JSON.stringify(chatSettings));
+    applyChatSettings();
+    showToast("تم حفظ الإعدادات بنجاح", "success");
+  }
+  
+  // تطبيق إعدادات الدردشة
+  function applyChatSettings() {
+    // تطبيق خلفية الدردشة
+    const chatContainer = document.querySelector('.chat-messages-container');
+    if (chatContainer) {
+      if (chatSettings.wallpaper === 'wa1') {
+        chatContainer.style.backgroundImage = 'url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNlZGVlZWUiIGZpbGwtb3BhY2l0eT0iMC40Ij48cGF0aCBkPSJNNDAgMEgyMEM4Ljk1NCAwIDAgOC45NTQgMCAyMGMwIDExLjA0NiA4Ljk1NCAyMCAyMCAyMGgxMGMxMS4wNDYgMCAyMC04Ljk1NCAyMC0yMHMtOC45NTQtMjAtMjAtMjB6TTIwIDJjOS45NDEgMCAxOCA4LjA1OSAxOCAxOHMtOC4wNTkgMTgtMTggMThINmMtOS45NDEgMC0xOC04LjA1OS0xOC0xOHM4LjA1OS0xOCAxOC0xOGgxNHoiLz48L2c+PC9nPjwvc3ZnPg==")';
+        chatContainer.style.backgroundColor = '#efeae2';
+      } else if (chatSettings.wallpaper === 'wa2') {
+        chatContainer.style.backgroundImage = 'none';
+        chatContainer.style.backgroundColor = '#f5f5f5';
+      } else if (chatSettings.wallpaper === 'solid') {
+        chatContainer.style.backgroundImage = 'none';
+        chatContainer.style.backgroundColor = '#ffffff';
+      }
+    }
+    
+    // تطبيق حجم الخط
+    const chatMessages = document.querySelector('.chat-messages');
+    if (chatMessages) {
+      if (chatSettings.fontSize === 'sm') {
+        chatMessages.style.fontSize = '0.85rem';
+      } else if (chatSettings.fontSize === 'md') {
+        chatMessages.style.fontSize = '1rem';
+      } else if (chatSettings.fontSize === 'lg') {
+        chatMessages.style.fontSize = '1.15rem';
+      }
+    }
+  }
+  
+  // تحميل سجلات المحادثات
+  function loadMessageThreads() {
+    const savedThreads = localStorage.getItem('messageThreads');
+    if (savedThreads) {
+      messageThreads = JSON.parse(savedThreads);
+    } else {
+      // إنشاء محادثات تجريبية
+      messageThreads = [
+        {
+          id: 1,
+          employeeId: 2,
+          employeeName: "سارة علي",
+          lastMessage: "هل انتهيت من التقرير؟",
+          lastMessageTime: "10:15",
+          unread: 2,
+          messages: [
+            { id: 1, senderId: 2, text: "مرحباً أحمد، كيف حالك؟", time: "09:30", date: "2023-10-15" },
+            { id: 2, senderId: 1, text: "أهلاً سارة، أنا بخير الحمدلله. وأنت؟", time: "09:32", date: "2023-10-15" },
+            { id: 3, senderId: 2, text: "أنا أيضاً بخير، شكراً. هل انتهيت من التقرير؟", time: "10:15", date: "2023-10-15" }
+          ],
+          createdAt: "2023-10-15"
+        },
+        {
+          id: 2,
+          employeeId: 3,
+          employeeName: "محمد خالد",
+          lastMessage: "نعم، سأرسله لك خلال ساعة",
+          lastMessageTime: "أمس",
+          unread: 0,
+          messages: [
+            { id: 1, senderId: 1, text: "مرحباً محمد، هل لديك مستندات الاجتماع؟", time: "14:20", date: "2023-10-14" },
+            { id: 2, senderId: 3, text: "نعم، سأرسله لك خلال ساعة", time: "14:25", date: "2023-10-14" }
+          ],
+          createdAt: "2023-10-14"
+        },
+        {
+          id: 3,
+          employeeId: 4,
+          employeeName: "فاطمة حسن",
+          lastMessage: "شكراً لك على المساعدة",
+          lastMessageTime: "الثلاثاء",
+          unread: 0,
+          messages: [
+            { id: 1, senderId: 4, text: "أحمد، هل يمكنك مساعدتي في المشروع الجديد؟", time: "11:10", date: "2023-10-10" },
+            { id: 2, senderId: 1, text: "بالتأكيد فاطمة، أخبريني بما تحتاجين", time: "11:15", date: "2023-10-10" },
+            { id: 3, senderId: 4, text: "شكراً لك على المساعدة", time: "11:20", date: "2023-10-10" }
+          ],
+          createdAt: "2023-10-10"
+        }
+      ];
+      saveMessageThreads();
+    }
+  }
+  
+  // حفظ سجلات المحادثات
+  function saveMessageThreads() {
+    localStorage.setItem('messageThreads', JSON.stringify(messageThreads));
+  }
+  
+  // عرض قائمة المحادثات
+  function renderMessageThreads() {
+    const threadList = document.getElementById('messagesThreadList');
+    const threadCount = document.getElementById('threadCount');
+    const searchTerm = document.getElementById('msgSearch').value.toLowerCase();
+    
+    let filteredThreads = messageThreads;
+    
+    // تطبيق البحث إذا كان موجوداً
+    if (searchTerm) {
+      filteredThreads = messageThreads.filter(thread => 
+        thread.employeeName.toLowerCase().includes(searchTerm) ||
+        thread.lastMessage.toLowerCase().includes(searchTerm)
+      );
+      document.getElementById('clearSearchBtn').style.display = 'block';
+    } else {
+      document.getElementById('clearSearchBtn').style.display = 'none';
+    }
+    
+    // تحديث العداد
+    threadCount.textContent = `${filteredThreads.length} محادثة`;
+    
+    // إذا لم توجد محادثات
+    if (filteredThreads.length === 0) {
+      threadList.innerHTML = `
+        <div class="empty-threads">
+          <div class="empty-icon">
+            <i class="bi bi-chat-left-text"></i>
+          </div>
+          <div class="empty-text">
+            ${searchTerm ? 'لم يتم العثور على محادثات' : 'لا توجد محادثات بعد'}
+          </div>
+          ${!searchTerm ? '<button class="btn btn-primary mt-2" onclick="startNewThread()">بدء محادثة جديدة</button>' : ''}
+        </div>
+      `;
+      return;
+    }
+    
+    // عرض المحادثات
+    let threadsHTML = '';
+    
+    filteredThreads.forEach(thread => {
+      const isActive = thread.id === activeThreadId;
+      threadsHTML += `
+        <div class="thread-item ${isActive ? 'active' : ''}" onclick="openThread(${thread.id})">
+          <div class="thread-avatar">
+            <i class="bi bi-person-circle"></i>
+          </div>
+          <div class="thread-content">
+            <div class="thread-header">
+              <div class="thread-name">${thread.employeeName}</div>
+              <div class="thread-time">${thread.lastMessageTime}</div>
+            </div>
+            <div class="thread-preview">${thread.lastMessage}</div>
+          </div>
+          ${thread.unread > 0 ? `<div class="thread-unread">${thread.unread}</div>` : ''}
+        </div>
+      `;
+    });
+    
+    threadList.innerHTML = threadsHTML;
+  }
+  
+  // فتح محادثة
+  function openThread(threadId) {
+    activeThreadId = threadId;
+    const thread = messageThreads.find(t => t.id === threadId);
+    
+    if (!thread) return;
+    
+    // تحديث واجهة المحادثة
+    document.getElementById('chatPeerName').textContent = thread.employeeName;
+    document.getElementById('chatPeerStatusText').textContent = "متصل";
+    
+    // تحديث معلومات المحادثة
+    document.getElementById('chatInfoName').textContent = thread.employeeName;
+    document.getElementById('chatInfoStatus').textContent = "متصل";
+    document.getElementById('chatMessageCount').textContent = thread.messages.length;
+    document.getElementById('chatCreatedAt').textContent = thread.createdAt;
+    document.getElementById('chatLastActivity').textContent = thread.lastMessageTime;
+    
+    // إعادة عرض قائمة المحادثات
+    renderMessageThreads();
+    
+    // عرض الرسائل
+    renderThreadMessages(thread);
+    
+    // إعادة ضبط عدد الرسائل غير المقروءة
+    thread.unread = 0;
+    saveMessageThreads();
+  }
+  
+  // عرض رسائل المحادثة
+  function renderThreadMessages(thread) {
+    const messagesView = document.getElementById('messagesThreadView');
+    
+    if (!thread || !thread.messages || thread.messages.length === 0) {
+      messagesView.innerHTML = `
+        <div class="empty-messages">
+          <div class="empty-icon">
+            <i class="bi bi-chat-left"></i>
+          </div>
+          <div class="empty-text">لا توجد رسائل بعد في هذه المحادثة</div>
+          <div class="empty-hint">اكتب رسالة لبدء المحادثة</div>
+        </div>
+      `;
+      return;
+    }
+    
+    let messagesHTML = '';
+    let currentDate = '';
+    
+    thread.messages.forEach(message => {
+      // عرض التاريخ إذا تغير
+      if (message.date !== currentDate) {
+        currentDate = message.date;
+        const dateObj = new Date(message.date);
+        const dateString = dateObj.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        messagesHTML += `
+          <div class="message-date">
+            <span>${dateString}</span>
+          </div>
+        `;
+      }
+      
+      // تحديد إذا كانت الرسالة مرسلة أو مستلمة
+      const isSent = message.senderId === currentUser.id;
+      const messageClass = isSent ? 'message sent' : 'message received';
+      
+      messagesHTML += `
+        <div class="${messageClass}">
+          <div class="message-bubble">${message.text}</div>
+          <div class="message-time">${message.time}</div>
+        </div>
+      `;
+    });
+    
+    messagesView.innerHTML = messagesHTML;
+    
+    // التمرير إلى الأسفل لعرض أحدث الرسائل
+    setTimeout(() => {
+      messagesView.scrollTop = messagesView.scrollHeight;
+    }, 100);
+  }
+  
+  // بدء محادثة جديدة
+  function startNewThread() {
+    const modal = new bootstrap.Modal(document.getElementById('newThreadModal'));
+    
+    // تعبئة قائمة الموظفين
+    const select = document.getElementById('newThreadEmployeeSelect');
+    select.innerHTML = '';
+    
+    employees.forEach(employee => {
+      // تجنب إضافة المستخدم الحالي
+      if (employee.id !== currentUser.id) {
+        const option = document.createElement('option');
+        option.value = employee.id;
+        option.textContent = employee.name;
+        select.appendChild(option);
+      }
+    });
+    
+    modal.show();
+  }
+  
+  // إنشاء محادثة جديدة
+  function createNewThread() {
+    const select = document.getElementById('newThreadEmployeeSelect');
+    const messageInput = document.getElementById('newThreadMessage');
+    
+    const employeeId = parseInt(select.value);
+    const messageText = messageInput.value.trim();
+    
+    if (!employeeId || !messageText) {
+      showToast("يرجى اختيار موظف وكتابة رسالة", "error");
+      return;
+    }
+    
+    // البحث عن الموظف
+    const employee = employees.find(emp => emp.id === employeeId);
+    if (!employee) {
+      showToast("لم يتم العثور على الموظف", "error");
+      return;
+    }
+    
+    // التحقق إذا كانت المحادثة موجودة مسبقاً
+    let existingThread = messageThreads.find(thread => thread.employeeId === employeeId);
+    
+    if (existingThread) {
+      // فتح المحادثة الموجودة
+      openThread(existingThread.id);
+      // إغلاق المودال
+      bootstrap.Modal.getInstance(document.getElementById('newThreadModal')).hide();
+      return;
+    }
+    
+    // إنشاء محادثة جديدة
+    const newThreadId = messageThreads.length > 0 ? Math.max(...messageThreads.map(t => t.id)) + 1 : 1;
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+    const dateString = now.toISOString().split('T')[0];
+    
+    const newThread = {
+      id: newThreadId,
+      employeeId: employeeId,
+      employeeName: employee.name,
+      lastMessage: messageText,
+      lastMessageTime: timeString,
+      unread: 0,
+      messages: [
+        { id: 1, senderId: currentUser.id, text: messageText, time: timeString, date: dateString }
+      ],
+      createdAt: dateString
+    };
+    
+    messageThreads.push(newThread);
+    saveMessageThreads();
+    
+    // فتح المحادثة الجديدة
+    openThread(newThreadId);
+    
+    // إغلاق المودال ومسح الحقول
+    bootstrap.Modal.getInstance(document.getElementById('newThreadModal')).hide();
+    messageInput.value = '';
+    
+    showToast("تم بدء المحادثة بنجاح", "success");
+  }
+  
+  // إرسال رسالة
+  function sendInternalMessage() {
+    const messageInput = document.getElementById('msgBody');
+    const messageText = messageInput.value.trim();
+    
+    if (!messageText) {
+      showToast("يرجى كتابة رسالة", "error");
+      return;
+    }
+    
+    if (!activeThreadId) {
+      showToast("يرجى اختيار محادثة أولاً", "error");
+      return;
+    }
+    
+    const thread = messageThreads.find(t => t.id === activeThreadId);
+    if (!thread) {
+      showToast("لم يتم العثور على المحادثة", "error");
+      return;
+    }
+    
+    // إضافة الرسالة
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+    const dateString = now.toISOString().split('T')[0];
+    
+    const newMessageId = thread.messages.length > 0 ? Math.max(...thread.messages.map(m => m.id)) + 1 : 1;
+    
+    thread.messages.push({
+      id: newMessageId,
+      senderId: currentUser.id,
+      text: messageText,
+      time: timeString,
+      date: dateString
+    });
+    
+    // تحديث آخر رسالة ووقتها
+    thread.lastMessage = messageText;
+    thread.lastMessageTime = timeString;
+    
+    saveMessageThreads();
+    
+    // إعادة عرض الرسائل
+    renderThreadMessages(thread);
+    
+    // مسح حقل الإدخال
+    messageInput.value = '';
+    
+    // إعادة عرض قائمة المحادثات
+    renderMessageThreads();
+    
+    // محاكاة الرد التلقائي (للتجربة فقط)
+    simulateReply(thread);
+  }
+  
+  // محاكاة رد تلقائي (للتجربة)
+  function simulateReply(thread) {
+    const replies = [
+      "شكراً على رسالتك",
+      "حسناً، سأفعل ذلك",
+      "هل يمكنك توضيح المزيد؟",
+      "أتفق معك في هذا",
+      "سأراجع هذا الأمر وأعود إليك",
+      "هل هذا مستعجل؟"
+    ];
+    
+    // 50% فرصة للرد التلقائي
+    if (Math.random() > 0.5) {
+      setTimeout(() => {
+        const employee = employees.find(emp => emp.id === thread.employeeId);
+        if (!employee) return;
+        
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+        const dateString = now.toISOString().split('T')[0];
+        const randomReply = replies[Math.floor(Math.random() * replies.length)];
+        
+        const newMessageId = thread.messages.length > 0 ? Math.max(...thread.messages.map(m => m.id)) + 1 : 1;
+        
+        thread.messages.push({
+          id: newMessageId,
+          senderId: employee.id,
+          text: randomReply,
+          time: timeString,
+          date: dateString
+        });
+        
+        // تحديث آخر رسالة ووقتها
+        thread.lastMessage = randomReply;
+        thread.lastMessageTime = timeString;
+        thread.unread = (thread.unread || 0) + 1;
+        
+        saveMessageThreads();
+        
+        // إذا كانت المحادثة مفتوحة، تحديث العرض
+        if (activeThreadId === thread.id) {
+          renderThreadMessages(thread);
+          thread.unread = 0;
+        }
+        
+        // إعادة عرض قائمة المحادثات
+        renderMessageThreads();
+        
+        // إشعار
+        if (chatSettings.notifications) {
+          showNotification(employee.name, randomReply);
+        }
+      }, 2000 + Math.random() * 3000);
+    }
+  }
+  
+  // فتح إعدادات المراسلة
+  function openChatSettings() {
+    // تعبئة الحقول ببيانات المستخدم
+    document.getElementById('waProfileName').value = currentUser.name;
+    document.getElementById('waProfileStatus').value = currentUser.status;
+    
+    // تعبئة إعدادات الخصوصية
+    document.getElementById('waPrivacyLastSeen').value = currentUser.lastSeen || 'everyone';
+    document.getElementById('waPrivacyReadReceipts').checked = currentUser.readReceipts || true;
+    
+    // تعبئة إعدادات الدردشة
+    document.getElementById('waChatWallpaper').value = chatSettings.wallpaper || 'wa1';
+    document.getElementById('waChatFontSize').value = chatSettings.fontSize || 'md';
+    document.getElementById('waAutoSaveMedia').checked = chatSettings.autoSaveMedia || false;
+    document.getElementById('waShowPreviews').checked = chatSettings.showPreviews || true;
+    
+    // تعبئة إعدادات الإشعارات
+    document.getElementById('waNotifEnabled').checked = chatSettings.notifications || true;
+    document.getElementById('waNotifSound').checked = chatSettings.sound || true;
+    document.getElementById('waNotifVibrate').checked = chatSettings.vibrate || true;
+    document.getElementById('waNotifTone').value = chatSettings.tone || 'default';
+    
+    // فتح المودال
+    const modal = new bootstrap.Modal(document.getElementById('waChatSettingsModal'));
+    modal.show();
+  }
+  
+  // حفظ ملف تعريف المستخدم
+  function saveChatProfile() {
+    const name = document.getElementById('waProfileName').value.trim();
+    const status = document.getElementById('waProfileStatus').value.trim();
+    
+    if (!name) {
+      showToast("يرجى إدخال اسم المستخدم", "error");
+      return;
+    }
+    
+    // تحديث بيانات المستخدم
+    currentUser.name = name;
+    currentUser.status = status || "متاح للعمل";
+    
+    // تحديث إعدادات الخصوصية
+    currentUser.lastSeen = document.getElementById('waPrivacyLastSeen').value;
+    currentUser.readReceipts = document.getElementById('waPrivacyReadReceipts').checked;
+    
+    // حفظ البيانات
+    saveUserData();
+    
+    // تحديث واجهة المستخدم
+    updateUserProfileUI();
+    
+    showToast("تم حفظ الملف الشخصي بنجاح", "success");
+  }
+  
+  // تحديث واجهة ملف تعريف المستخدم
+  function updateUserProfileUI() {
+    // تحديث الشريط الجانبي
+    document.getElementById('sidebarUserName').textContent = currentUser.name;
+    document.getElementById('sidebarStatusText').textContent = currentUser.status;
+    
+    // تحديث الهيدر
+    if (document.getElementById('navbarUserName')) {
+      document.getElementById('navbarUserName').textContent = currentUser.name;
+    }
+  }
+  
+  // تحديث حالة المستخدم
+  function updateUserStatus() {
+    const statuses = ["متاح للعمل", "في اجتماع", "بعيد", "مشغول", "متاح"];
+    const randomIndex = Math.floor(Math.random() * statuses.length);
+    
+    // تحديث حالة المستخدم 20% من الوقت فقط
+    if (Math.random() < 0.2) {
+      currentUser.status = statuses[randomIndex];
+      saveUserData();
+      updateUserProfileUI();
+    }
+  }
+  
+  // تحديث وقت آخر ظهور
+  function updateLastSeen() {
+    // هنا يمكن إضافة منطق لتحديث آخر ظهور
+    // للتجربة، سنقوم بتحديث وقت آخر ظهور للموظفين الآخرين
+    employees.forEach(employee => {
+      if (Math.random() < 0.3) {
+        const now = new Date();
+        const minutesAgo = Math.floor(Math.random() * 60);
+        const lastSeenTime = new Date(now.getTime() - minutesAgo * 60000);
+        
+        if (minutesAgo < 1) {
+          employee.lastSeen = "الآن";
+        } else if (minutesAgo < 60) {
+          employee.lastSeen = `منذ ${minutesAgo} دقيقة`;
+        } else if (minutesAgo < 1440) {
+          const hoursAgo = Math.floor(minutesAgo / 60);
+          employee.lastSeen = `منذ ${hoursAgo} ساعة`;
+        } else {
+          employee.lastSeen = "أكثر من يوم";
+        }
+      }
+    });
+    
+    // إعادة عرض قائمة المحادثات إذا كان هناك بحث نشط
+    renderMessageThreads();
+  }
+  
+  // مسح المحادثة
+  function clearThread() {
+    if (!activeThreadId) {
+      showToast("يرجى اختيار محادثة أولاً", "error");
+      return;
+    }
+    
+    if (confirm("هل أنت متأكد من مسح هذه المحادثة؟ لا يمكن التراجع عن هذا الإجراء.")) {
+      const threadIndex = messageThreads.findIndex(t => t.id === activeThreadId);
+      
+      if (threadIndex !== -1) {
+        messageThreads.splice(threadIndex, 1);
+        saveMessageThreads();
+        
+        activeThreadId = null;
+        
+        // إعادة تعيين واجهة المحادثة
+        document.getElementById('chatPeerName').textContent = "اختر محادثة";
+        document.getElementById('chatPeerStatusText').textContent = "جاهز";
+        document.getElementById('messagesThreadView').innerHTML = `
+          <div class="empty-messages">
+            <div class="empty-icon">
+              <i class="bi bi-chat-left-text"></i>
+            </div>
+            <div class="empty-text">اختر محادثة من القائمة لبدء المراسلة</div>
+          </div>
+        `;
+        
+        // إعادة عرض قائمة المحادثات
+        renderMessageThreads();
+        
+        showToast("تم مسح المحادثة بنجاح", "success");
+      }
+    }
+  }
+  
+  // مسح البحث
+  function clearSearch() {
+    document.getElementById('msgSearch').value = '';
+    renderMessageThreads();
+  }
+  
+  // تفعيل/إلغاء تفعيل محدد الإيموجي
+  function toggleEmojiPicker() {
+    const emojiPicker = document.getElementById('emojiPicker');
+    emojiPicker.style.display = emojiPicker.style.display === 'block' ? 'none' : 'block';
+  }
+  
+  // إدراج إيموجي في نص الرسالة
+  function insertEmoji(emoji) {
+    const messageInput = document.getElementById('msgBody');
+    messageInput.value += emoji;
+    messageInput.focus();
+  }
+  
+  // إرفاق ملف
+  function attachFile() {
+    // في التطبيق الحقيقي، هنا سيكون رفع ملف
+    showToast("ميزة إرفاق الملفات ستكون متاحة في النسخة الكاملة", "info");
+  }
+  
+  // البحث في المحادثة
+  function searchInChat() {
+    if (!activeThreadId) {
+      showToast("يرجى اختيار محادثة أولاً", "error");
+      return;
+    }
+    
+    const modal = new bootstrap.Modal(document.getElementById('chatSearchModal'));
+    modal.show();
+  }
+  
+  // تنفيذ البحث في المحادثة
+  function performChatSearch() {
+    const searchInput = document.getElementById('chatSearchInput');
+    const searchTerm = searchInput.value.trim();
+    const resultsContainer = document.getElementById('chatSearchResults');
+    
+    if (!searchTerm) {
+      resultsContainer.innerHTML = '<div class="text-muted">اكتب كلمة للبحث</div>';
+      return;
+    }
+    
+    const thread = messageThreads.find(t => t.id === activeThreadId);
+    if (!thread || !thread.messages) {
+      resultsContainer.innerHTML = '<div class="text-muted">لا توجد رسائل في هذه المحادثة</div>';
+      return;
+    }
+    
+    const searchResults = thread.messages.filter(message => 
+      message.text.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    
+    if (searchResults.length === 0) {
+      resultsContainer.innerHTML = `<div class="text-muted">لا توجد نتائج للبحث عن "${searchTerm}"</div>`;
+      return;
+    }
+    
+    let resultsHTML = `<div class="search-results-count">تم العثور على ${searchResults.length} نتيجة</div>`;
+    
+    searchResults.forEach(message => {
+      const isSent = message.senderId === currentUser.id;
+      const senderName = isSent ? "أنت" : thread.employeeName;
+      
+      resultsHTML += `
+        <div class="search-result-item">
+          <div class="result-sender">${senderName}</div>
+          <div class="result-text">${highlightText(message.text, searchTerm)}</div>
+          <div class="result-time">${message.time} - ${message.date}</div>
+        </div>
+      `;
+    });
+    
+    resultsContainer.innerHTML = resultsHTML;
+  }
+  
+  // تمييز النص في نتائج البحث
+  function highlightText(text, term) {
+    const regex = new RegExp(`(${term})`, 'gi');
+    return text.replace(regex, '<mark>$1</mark>');
+  }
+  
+  // تبديل لوحة معلومات المحادثة
+  function toggleChatInfo() {
+    const infoPanel = document.getElementById('chatInfoPanel');
+    infoPanel.style.display = infoPanel.style.display === 'flex' ? 'none' : 'flex';
+  }
+  
+  // إظهار إشعار
+  function showNotification(title, body) {
+    // تحقق إذا كان المستخدم يسمح بالإشعارات
+    if (!("Notification" in window)) {
+      console.log("هذا المتصفح لا يدعم الإشعارات");
+      return;
+    }
+    
+    if (Notification.permission === "granted") {
+      new Notification(title, { body, icon: "/favicon.ico" });
+    } else if (Notification.permission !== "denied") {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          new Notification(title, { body, icon: "/favicon.ico" });
+        }
+      });
+    }
+  }
+  
+  // إظهار رسالة toast
+  function showToast(message, type = "info") {
+    // إنصراف toast إذا كان موجوداً
+    const existingToast = document.querySelector('.toast');
+    if (existingToast) {
+      existingToast.remove();
+    }
+    
+    // إنشاء toast جديد
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    
+    toast.innerHTML = `
+      <div class="d-flex">
+        <div class="toast-body">
+          ${message}
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // إظهار toast
+    const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+    bsToast.show();
+    
+    // إزالة toast بعد اختفائه
+    toast.addEventListener('hidden.bs.toast', function () {
+      toast.remove();
+    });
+  }
+  
+  // تحديث المحادثات
+  function refreshThreads() {
+    renderMessageThreads();
+    showToast("تم تحديث المحادثات", "info");
+  }
+</script>

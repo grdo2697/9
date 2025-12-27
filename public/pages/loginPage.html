@@ -1,0 +1,45 @@
+<div class="auth-container" id="loginPage">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h2> الدخول</h2>
+      <p>سجّل بحسابك (Google) أو استخدم الإيميل وكلمة المرور إذا كان عندك صلاحيات</p>
+    </div>
+
+    <!-- Inline error/success messages -->
+    <div id="loginInlineAlert" class="alert" role="alert" style="display:none; margin-top:10px;"></div>
+
+    <!-- Google Sign-In (Public Registration) -->
+    <!-- ملاحظة: غيّر GOOGLE_CLIENT_ID داخل app.js حتى يشتغل تسجيل الدخول بالكوكل -->
+    <div class="mb-3">
+      <div id="googleSignInBox" class="w-100" style="display:flex; justify-content:center;"></div>
+      <small class="text-muted d-block mt-2" style="text-align:center;">
+        أي شخص يقدر يسجّل/يدخل بالكوكل، ويصير صلاحياته <b>زائر</b> ويشوف فقط (عن الشركة + التقديم على وظيفة).
+      </small>
+    </div>
+
+    <hr class="my-3"/>
+
+    <!-- Email/Password (Admin-created users) -->
+    <form id="loginForm">
+      <div class="form-group">
+        <label class="form-label" for="loginEmail">البريد الإلكتروني</label>
+        <input class="form-control" id="loginEmail" placeholder="" required type="email" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="loginPassword">كلمة المرور</label>
+        <input class="form-control" id="loginPassword" placeholder="********" required type="password" />
+      </div>
+
+      <div class="form-group">
+        <button class="btn btn-primary w-100" type="submit">تسجيل الدخول</button>
+      </div>
+
+      <div class="auth-footer">
+        <small class="text-muted">
+          إذا ما عندك صلاحيات، استخدم زر Google بالأعلى.
+        </small>
+      </div>
+    </form>
+  </div>
+</div>
